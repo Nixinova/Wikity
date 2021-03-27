@@ -1,0 +1,58 @@
+'''Wikity''' is a very useful build tool!
+
+= Root =
+== Heading ==
+=== Subheading ===
+== Broken heading ===
+
+''Italic''
+'''Bold'''
+'''''Bold Italic'''''
+
+* Bulleted list
+* Bulleted list item 2
+** Sub-item
+*** Indented
+* Root item
+# Numbered list
+# Numbered list item 2
+## Sub-item
+### Indented
+# Root item
+
+;Pseudoheader
+: Root indent
+:: Subindent
+::: Indented
+
+[[Link]]
+[[Link|Text]]
+
+[https://github.com]
+[https://google.com External link]
+[not a link]
+
+{{subst}}
+{{subst|Hello!}}
+{{nonexistent template}}
+
+<script src="malicious.js"></script>
+<code>Code</code>
+
+``code``
+```
+code block
+```
+
+{{#if: true | true text | false text }}
+{{ #vardefine: test | value }}
+[[{{ #var:test }}]]
+"{{#var: unset | this {{=}} unset }}"
+{{#switch: value
+| nope = none
+| val = val!
+| #default = one
+}}
+{{#date: Y-m-d \m | 27 Mar 21}}
+
+{{displaytitle: Example}}
