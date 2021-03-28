@@ -1,5 +1,8 @@
-import glob from 'glob';
-import fs from 'fs';
+const fs = require('fs');
+const glob = require('glob');
+const formatter = require('html-formatter');
+const novasheets = require('novasheets');
+
 import { parse } from './parse';
 
 const OUT_FOLDER = 'wikity-out/';
@@ -10,7 +13,7 @@ type Config = {
     customStyles?: string,
 }
 
-export function compile(dir: string = '.', config: Config = {}) {
+export function compile(dir: string = '.', config: Config = {}): void {
     let stylesCreated = false;
     // Write wikitext files
     const files = glob.sync((dir || '.') + "/**/*.wiki", {});
@@ -29,59 +32,62 @@ export function compile(dir: string = '.', config: Config = {}) {
         let frontMatter: string = '';
         if (config.eleventy) {
             frontMatter = `
-                    ---
-                    permalink: /wiki/${url}
-                    ---
-                `.trim().replace(/^\s+/gm, '');
+                ---
+                permalink: /wiki/${url}
+                ---
+            `.trimStart().replace(/^\s+/gm, '');
         }
 
         // Create HTML
         let html = `
-                ${frontMatter}
-                <html>
-                    <head>
-                        <meta charset="UTF-8">
-                        <title>${displayTitle}</title>
-                        <link rel="stylesheet" href="/wiki.css">
-                    </head>
-                    <body>
-                        <header>
-                            <h1>${displayTitle}</h1>
-                        </header>
-                        <main>\n${outText}
-                        </main>
-                        <footer>
-                            <div id="credit_wikity">Created using <a href="https://github.com/Nixinova/Wikity">Wikity</a></div>
-                        </footer>
-                    </body>
-                </html>
-            `.trim().replace(/^\s{1,20}/gm, '');
+            <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width">
+                    <meta name="description" content="${data.substr(0, 256)}">
+                    <title>${displayTitle}</title>
+                    <link rel="stylesheet" href="/wiki.css">
+                </head>
+                <body>
+                    <header>
+                        <h1>${displayTitle}</h1>
+                    </header>
+                    <main>
+                        <p>\n${outText}
+                        </p>
+                    </main>
+                    <footer>
+                        <p id="credit_wikity">Created using <a href="https://github.com/Nixinova/Wikity">Wikity</a></p>
+                    </footer>
+                </body>
+            </html>
+        `.trim().replace(/^\s{1,20}/gm, '');
 
         // Write to file
         if (!fs.existsSync(outFolder)) {
             fs.mkdirSync(outFolder);
             fs.mkdirSync(outFolder + 'templates/');
         }
-        fs.writeFileSync(outFolder + outFilename, html, 'utf8');
+        fs.writeFileSync(outFolder + outFilename, frontMatter + formatter.render(html), 'utf8');
 
         // Create site files
         if (stylesCreated) return;
         stylesCreated = true;
         let styles: string = '';
         if (config.defaultStyles !== false) {
-            styles += `
-                    body {font-family: sans-serif; margin: 4em; max-width: 1000px; background: #eee;}
-                    main {margin: 3em -1em; background: #fff; padding: 1em;}
-                    h1, h2 {margin-bottom: 0.6em; font-weight: normal; border-bottom: 1px solid #a2a9b1;}
-                    ul, ol {margin: 0.3em 0 0 1.6em; padding: 0;}
-                    dt {font-weight: bold;}
-                    dd, dl dl {margin-block: 0; margin-inline-start: 30px;}
-            
-                    a:not(:hover) {text-decoration: none;}
-                    a.internal-link {color: #04a;} a.internal-link:visited {color: #26d;}
-                    a.external-link {color: #36b;} a.external-link:visited {color: #58d;} a.external-link::after {content: '\\1f855';}
-                    a.redlink {color: #d33;} a.redlink:visited {color: #a58;}
-                `;
+            styles += novasheets.parse(`
+                body {font-family: sans-serif; margin: 4em; max-width: 1000px; background: #eee;}
+                main {margin: 3em -1em; background: #fff; padding: 1em;}
+                h1, h2 {margin-bottom: 0.6em; font-weight: normal; border-bottom: 1px solid #a2a9b1;}
+                ul, ol {margin: 0.3em 0 0 1.6em; padding: 0;}
+                dt {font-weight: bold;}
+                dd, dl dl {margin-block: 0; margin-inline-start: 30px;}
+
+                a:not(:hover) {text-decoration: none;}
+                a.internal-link {color: #04a;} &:visited {color: #26d;}
+                a.external-link {color: #36b;} &:visited {color: #58d;} &::after {content: '\\1f855';}
+                a.redlink {color: #d33;} &:visited {color: #b44;}
+            `.replace(/^\s+/gm, ''));
         }
         if (config.customStyles) styles += config.customStyles;
         fs.writeFileSync(outFolder + 'wiki.css.njk', '---\npermalink: /wiki.css\n---\n' + styles);

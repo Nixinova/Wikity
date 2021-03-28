@@ -30,6 +30,9 @@ else if (arg(1).includes('h')) {
 else if (arg(1).includes('c')) {
     wikity.compile(arg(2) || '.', { eleventy: !!arg(3) });
 }
+else if (arg(1).includes('p')) {
+    console.log(wikity.parse(arg(2)));
+}
 else if (arg(1).includes('v')) {
     console.log('The current version of Wikity is ' + VERSION);
 }

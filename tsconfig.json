@@ -10,7 +10,7 @@
     //"allowJs": true,
     //"checkJs": true,
     //"jsx": "preserve",
-    //"declaration": true,
+    "declaration": true,
     //"declarationMap": true,
     //"sourceMap": true,
     //"outFile": "./",

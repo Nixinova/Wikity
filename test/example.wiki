@@ -37,12 +37,19 @@
 {{nonexistent template}}
 
 <script src="malicious.js"></script>
+<div onclick="malicious()"></div>
 <code>Code</code>
 
 ``code``
 ```
 code block
 ```
+
+<nowiki>
+Non-parsed content &amp; tags.
+{{#var: varname}}
+<div onclick="malicious"></div>
+</nowiki>
 
 {{#if: true | true text | false text }}
 {{ #vardefine: test | value }}
@@ -54,5 +61,7 @@ code block
 | #default = one
 }}
 {{#date: Y-m-d \m | 27 Mar 21}}
+{{#vardefine: nested | {{#var: null | nil}} {{#vardefine: x | 1}} {{=}}.}}
+{{#var: nested}}
 
-{{displaytitle: Example}}
+<!-- {{displaytitle: Example}} -->

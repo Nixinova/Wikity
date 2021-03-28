@@ -1,6 +1,6 @@
 # Wikity
 
-**Wikity** is a tool that allows you to use Wikitext (used by Wikipedia, Fandom, etc) to create pages, for use in build tools such as [Eleventy](https://11ty.dev).
+**Wikity** is a tool that allows you to use Wikitext (used by Wikipedia, Fandom, etc) as a templating language to create HTML pages, useful in build tools such as [Eleventy](https://11ty.dev).
 
 ## Install
 
@@ -23,6 +23,8 @@ Wikity is available [on npm](https://www.npmjs.com/package/wikity).
       - Whether to use default wiki styling (default: `true`).
     - `customStyles?: string`
       - Custom CSS to style the wiki pages (default: `''`).
+- `wikity.clean()`
+  - Clean up residual folders after compilation.
 
 Calling `wikity()` will compile all `.wiki` files into their corresponding `.html` versions.
 Outputted files are located in the `wikity-out/` directory.
@@ -42,7 +44,7 @@ wikity.compile('.', { eleventy: true });
 
 ## Usage
 
-Use [Wikitext](https://en.wikipedia.org/wiki/Help:Wikitext) to create your pages.
+Use [Wikitext](https://en.wikipedia.org/wiki/Help:Wikitext) (file extension `.wiki`) to create your pages.
 
 Any wiki templates (called using `{{template name}}`) must be inside the `templates/` folder.
 
@@ -55,8 +57,8 @@ Any wiki templates (called using `{{template name}}`) must be inside the `templa
 | `'''''bold italic'''''`          | ***bold italic***                         |
 | ` ``code`` `                     | `code`                                    |
 | ` ```code block``` `             | <pre>code block</pre>                     |
-| `= heading =`                    | <h1>heading</h1>                          |
-| `== subheading ==`               | <h2>subheading</h2>                       |
+| `=heading=`                      | <big><big><big>heading</big></big></big>  |
+| `==subheading==`                 | <big><big>subheading</big></big>          |
 | `*bulleted`                      | <ul><li>bulleted</li></ul>                |
 | `**sub-bulleted`                 | <ul><ul><li>sub-bulleted</li></ul></ul>   |
 | `#numbered`                      | <ol><li>numbered</li></ol>                |
@@ -67,14 +69,22 @@ Any wiki templates (called using `{{template name}}`) must be inside the `templa
 | `[[link\|display text]]`         | [display text](#link)                     |
 | `[external-link]`                | [[1]](#external-link)                     |
 | `[external-link display text]`   | [display text](#external-link)            |
-| `{{name}}`                       | *(contents of `templates/name.wiki`)*     |
-| `{{name\|arg=val}}`              | *(ditto but `{{{arg}}}` is set to 'val')* |
+| `{{tp name}}`                    | *(contents of `templates/tp_name.wiki`)*  |
+| `{{tp name\|arg=val}}`           | *(ditto but `{{{arg}}}` is set to 'val')* |
 | `{{{arg}}}`                      | *(value given by template)*               |
-| `{{{arg\|default val}}}`         | *(ditto but with default val if unset)*   |
+| `{{{arg\|default val}}}`         | *(ditto but 'default val' if unset)*      |
 | `{{#if:non-empty-string\|text}}` | text                                      |
 | `{{#ifeq:1\|2\|true\|false}}`    | false                                     |
 | `{{#vardefine:varname\|text}}`   | *(saved to memory)*                       |
 | `{{#var:varname}}`               | text *(from memory)*                      |
-| `{{#var:varname\|default val}}`  | *(ditto but with default val if unset)*   |
+| `{{#var:varname\|default val}}`  | *(ditto but 'default val' if unset)*      |
+| `{{#switch:a\|a=1\|b=2\|c=3}}`   | 1                                         |
+| `{{#time:d-M-y\|2021-03-28}}`    | 28-Mar-21                                 |
+| `{{lc:TEXT}}`                    | text                                      |
+| `{{ucfirst:text}}`               | Text                                      |
 | `<ref>Text</ref>`                | <sup id=cite-1>[[1]](#ref-1)</sup>        |
-| `{{reflist}}`                    | 1. <a id=ref-1>[↑](#cite-1)</a> Text      |
+| `<references/>`                  | 1. <a id=ref-1>[↑](#cite-1)</a> Text      |
+| `<noinclude>No</noinclude>`      | *(blank outside a template)*              |
+| `<onlyinclude>Yes</onlyinclude>` | Yes                                       |
+| `<includeonly>Yes</includeonly>` | Yes *(blank inside a template)*           |
+| `<nowiki>[[no link]]</nowiki>`   | [[no link]]                               |
