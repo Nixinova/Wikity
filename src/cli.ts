@@ -2,7 +2,7 @@
 
 import wikity from './index';
 
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 
 const indent = (n: number): string => ' '.repeat(n * 4);
 const usage = (command: string, ...desc: string[]): void => {
@@ -16,14 +16,17 @@ if (!arg(1)) {
     console.log('Type `wikity help` for a list of commands.');
 }
 else if (arg(1).includes('h')) {
-    console.log(`\n${indent(1)}Wikity commands:`);
-    usage(`wikity help`,
+    console.log(`\n${indent(1)}Wikity CLI commands:`);
+    usage(`wikity [--]h[elp]`,
         `Display this help message.`,
     );
-    usage(`wikity compile [<folder>]`,
+    usage(`wikity [--]c[ompile] [<folder>]`,
         `Compile wikitext files from a given folder.`,
     )
-    usage(`wikity version`,
+    usage(`wikity [--]p[arse] "<input>"`,
+        `Parse raw wikitext from the command line.`,
+    )
+    usage(`wikity [--]v[ersion]`,
         `Display the current version of Wikity.`,
     );
 }

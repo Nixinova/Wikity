@@ -1,12 +1,21 @@
 const fs = require('fs');
+const htmlEscape = require('escape-html');
+const dateFormat = require('dateformat');
 
-const re = (regex: string, flag: string = 'mgis') => RegExp(regex.replace(/ /g, '').replace(/\|\|.+?\|\|/g, ''), flag);
+import { Result, Metadata } from './types';
+
+const re = (regex: string, flag: string = 'mgi') =>
+    RegExp(regex.replace(/ /g, '').replace(/\|\|.+?\|\|/g, ''), flag);
 const r = String.raw;
+const MAX_RECURSION: number = 50;
+const arg: string = `\s*([^|}]+?)\s*`;
 
-export function parse(data: string): string {
+export function parse(data: string): Result {
 
-    const MAX_RECURSION: number = 50;
-    const vars: Record<string, any> = {};
+    const vars: Metadata = {};
+    const metadata: Metadata = {};
+    let nowikis: string[] = [];
+    let nowikiCount: number = 0;
     let rawExtLinkCount: number = 0;
     let refCount: number = 0;
     let refs: string[] = [];
@@ -18,19 +27,47 @@ export function parse(data: string): string {
 
         outText = outText
 
+            // Nowiki: <nowiki></nowiki>
+            .replace(re(r`<nowiki> ([^]+?) </nowiki>`), (_, m) => `%NOWIKI#${nowikis.push(m), nowikiCount++}%`)
+
             // Sanitise unacceptable HTML
             .replace(re(r`<(/?) \s* (?= script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea )`), '&lt;$1')
             .replace(re(r`(?<= <[^>]+ ) (\bon(\w+))`), 'data-$2')
 
             // Comments: <!-- -->
-            .replace(/<!--.+?-->/g, '')
+            .replace(/<!--[^]+?-->/g, '')
+
+            // Lines: ----
+            .replace(/^-{4,}/gm, '<hr>')
+
+            // Metadata: displayTitle, __NOTOC__, etc
+            .replace(re(r`{{ \s* displayTitle: ([^}]+) }}`), (_, title) => (metadata.displayTitle = title, ''))
+            .replace(re(r`__NOINDEX__`), () => (metadata.noindex = true, ''))
+            .replace(re(r`__NOTOC__`), () => (metadata.notoc = true, ''))
+            .replace(re(r`__FORCETOC__`), () => (metadata.toc = true, ''))
+            .replace(re(r`__TOC__`), () => (metadata.toc = true, `<toc></toc>`))
 
             // Magic words: {{!}}, {{reflist}}, etc
-            //.replace(re(r`{{ \s* displayTitle: ([^}]+) }}`), (_, title) => (displayTitle = title, ''))
             .replace(re(r`{{ \s* ! \s* }}`), '&vert;')
             .replace(re(r`{{ \s* = \s* }}`), '&equals;')
             .replace(re(r`{{ \s* [Rr]eflist \s* }}`), '<references/>')
 
+            // String functions: {{lc:}}, {{ucfirst:}}, {{len:}}, etc
+            .replace(re(r`{{ \s* #? urlencode: ${arg} }}`), (_, m) => encodeURI(m))
+            .replace(re(r`{{ \s* #? urldecode: ${arg} }}`), (_, m) => decodeURI(m))
+            .replace(re(r`{{ \s* #? lc: ${arg} }}`), (_, m) => m.toLowerCase())
+            .replace(re(r`{{ \s* #? uc: ${arg} }}`), (_, m) => m.toUpperCase())
+            .replace(re(r`{{ \s* #? lcfirst: ${arg} }}`), (_, m) => m[0].toLowerCase() + m.substr(1))
+            .replace(re(r`{{ \s* #? ucfirst: ${arg} }}`), (_, m) => m[0].toUpperCase() + m.substr(1))
+            .replace(re(r`{{ \s* #? len: ${arg} }}`), (_, m) => m.length)
+            .replace(re(r`{{ \s* #? pos: ${arg} \|${arg} (?: \s*\|${arg} )? }}`), (_, find, str, n = 0) => find.substr(n).indexOf(str))
+            .replace(re(r`{{ \s* #? sub: ${arg} \|${arg} (?:\|${arg})? }}`), (_, str, from, len) => str.substr(+from-1, +len))
+            .replace(re(r`{{ \s* #? padleft: ${arg} \|${arg} \|${arg} }}`), (_, str, n, char) => str.padStart(+n, char))
+            .replace(re(r`{{ \s* #? padright: ${arg} \|${arg} \|${arg} }}`), (_, str, n, char) => str.padEnd(+n, char))
+            .replace(re(r`{{ \s* #? replace: ${arg} \|${arg} \|${arg} }}`), (_, str, find, rep) => str.split(find).join(rep))
+            .replace(re(r`{{ \s* #? explode: ${arg} \|${arg} \|${arg} }}`), (_, str, delim, pos) => str.split(delim)[+pos])
+
+            // Parser functions: {{#if:}}, {{#switch:}}, etc
             .replace(re(r`{{ \s* (#\w+) \s* : \s* ( [^{}]+ ) \s* }}  ( ?!} )`), (_, name, content) => {
                 if (/{{\s*#/.test(content)) return _;
                 const args: string[] = content.trim().split(/\s*\|\s*/);
@@ -51,32 +88,7 @@ export function parse(data: string): string {
                             .filter(duo => args[0] === duo[0].replace('#default', args[0]))[0][1];
                     case '#time':
                     case '#date':
-                    case '#datetime':
-                        const date = args[1] ? new Date(args[1]) : new Date();
-                        let [dow, month, day, year, time, tz, ...tzparts] = date.toString().split(' ');
-                        const monthN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(month) + 1 + "";
-                        const [hr, min, sec] = time.split(':');
-                        const tzID = tzparts.join().replace(/[^A-Z]/g, '');
-                        return args[0]
-                            .replace(/(?<!\\)[MF]/g, '\\' + month)
-                            .replace(/(?<!\\)m/g, '\\' + monthN.padStart(2, '0'))
-                            .replace(/(?<!\\)n/g, '\\' + monthN)
-                            .replace(/(?<!\\)[Dl]/g, '\\' + dow)
-                            .replace(/(?<!\\)d/g, _ => '\\' + day)
-                            .replace(/(?<!\\)j/g, _ => '\\' + day.replace(/^0/, ''))
-                            .replace(/(?<!\\)Y/g, '\\' + year)
-                            .replace(/(?<!\\)y/g, '\\' + year.substr(2))
-                            .replace(/(?<!\\)H/g, '\\' + hr)
-                            .replace(/(?<!\\)G/g, '\\' + hr.replace(/^0/, ''))
-                            .replace(/(?<!\\)h/g, '\\' + (+hr % 12).toString().replace(/^0$/, '12'))
-                            .replace(/(?<!\\)g/g, '\\' + (+hr % 12).toString().replace(/^0$/, '12').replace(/^0/, ''))
-                            .replace(/(?<!\\)i/g, '\\' + min)
-                            .replace(/(?<!\\)s/g, '\\' + sec)
-                            .replace(/(?<!\\)e/g, '\\' + tzID)
-                            .replace(/(?<!\\)P/g, '\\' + tz)
-                            .replace(/(?<!\\)O/g, '\\' + tz.replace(':', ''))
-                            .replace(/(?<!\\)t/g, '\\' + time)
-                            .replace(/\\/g, '')
+                    case '#datetime': return dateFormat(args[1] ? new Date(args[1]) : new Date(), args[0])
                 }
             })
 
@@ -94,13 +106,18 @@ export function parse(data: string): string {
                     return `<a class="internal-link redlink" title="${title}" href="${page}">${title}</a>`;
                 }
 
+                // Remove non-template sections
+                content = content
+                    .replace(/<noinclude>.*?<\/noinclude>/gs, '')
+                    .replace(/.*<(includeonly|onlyinclude)>|<\/(includeonly|onlyinclude)>.*/gs, '')
+
                 // Substitite arguments
                 const argMatch = (arg: string): RegExp => re(r`{{{ \s* ${arg} (?:\|([^}]*))? \s* }}}`);
                 let args: string[] = params.split('|').slice(1);
                 for (let i in args) {
                     let parts = args[i].split('=')
                     let [arg, val]: string[] = parts[1] ? [parts[0], ...parts.slice(1)] : [(+i + 1) + '', parts[0]];
-                    content = content.replace(argMatch(arg), val || '$1');
+                    content = content.replace(argMatch(arg), (_, m) => val || m || '');
                 }
                 for (let i = 1; i <= 10; i++) {
                     content = content.replace(argMatch(i + ''), '$1');
@@ -114,7 +131,7 @@ export function parse(data: string): string {
             .replace(re(r`''  ([^']+?)  ''`), '<i>$1</i>')
 
             // Headings: ==heading==
-            .replace(re(r`^ (=+) (.+?) \1 \s* $`), (_, lvl, txt) => `<h${lvl.length}>${txt}</h${lvl.length}>`)
+            .replace(re(r`^ (=+) \s* (.+?) \s* \1 \s* $`), (_, lvl, txt) => `<h${lvl.length} id="${encodeURI(txt.replace(/ /g, '_'))}">${txt}</h${lvl.length}>`)
 
             // Internal links: [[Page]] and [[Page|Text]]
             .replace(re(r`\[\[ ([^\]|]+?) \]\]`), `<a class="internal-link" title="$1" href="/$1">$1</a>`)
@@ -125,16 +142,16 @@ export function parse(data: string): string {
             .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => `<a class="external-link" href="${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`)
 
             // Bulleted list: *item
-            .replace(re(r`^ (\*+) (.+?) $`, 'gm'), (_, lvl, txt) => `${'<ul>'.repeat(lvl.length)}<li>${txt}</li>${'</ul>'.repeat(lvl.length)}`)
+            .replace(re(r`^ (\*+) (.+?) $`), (_, lvl, txt) => `${'<ul>'.repeat(lvl.length)}<li>${txt}</li>${'</ul>'.repeat(lvl.length)}`)
             .replace(re(r`</ul> (\s*?) <ul>`), '$1')
 
             // Numbered list: #item
-            .replace(re(r`^ (#+) (.+?) $`, 'gm'), (_, lvl, txt) => `${'<ol>'.repeat(lvl.length)}<li>${txt}</li>${'</ol>'.repeat(lvl.length)}`)
+            .replace(re(r`^ (#+) (.+?) $`), (_, lvl, txt) => `${'<ol>'.repeat(lvl.length)}<li>${txt}</li>${'</ol>'.repeat(lvl.length)}`)
             .replace(re(r`</ol> (\s*?) <ol>`), '$1')
 
             // Definition list: ;head, :item
-            .replace(re(r`^ ; (.+) $`, 'gm'), '<dl><dt>$1</dt></dl>')
-            .replace(re(r`^ (:+) (.+?) $`, 'gm'), (_, lvl, txt) => `${'<dl>'.repeat(lvl.length)}<dd>${txt}</dd>${'</dl>'.repeat(lvl.length)}`)
+            .replace(re(r`^ ; (.+) $`), '<dl><dt>$1</dt></dl>')
+            .replace(re(r`^ (:+) (.+?) $`), (_, lvl, txt) => `${'<dl>'.repeat(lvl.length)}<dd>${txt}</dd>${'</dl>'.repeat(lvl.length)}`)
             .replace(re(r`</dl> (\s*?) <dl>`), '$1')
 
             // References: <ref></ref>, <references/>
@@ -154,6 +171,10 @@ export function parse(data: string): string {
             // Spacing
             .replace(/(\r?\n){2}/g, '\n</p><p>\n')
 
+            // Restore nowiki contents
+            .replace(/%NOWIKI#(\d+)%/g, (_, n) => htmlEscape(nowikis[n]))
     }
-    return outText;
+    let result: Result = new Result(outText);
+    result.metadata = metadata;
+    return result;
 }

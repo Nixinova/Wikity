@@ -1,7 +1,2 @@
-declare type Config = {
-    eleventy?: boolean;
-    defaultStyles?: boolean;
-    customStyles?: string;
-};
+import { Config } from './types';
 export declare function compile(dir?: string, config?: Config): void;
-export {};

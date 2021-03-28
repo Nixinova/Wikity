@@ -65,6 +65,8 @@ Any wiki templates (called using `{{template name}}`) must be inside the `templa
 | `##sub-numbered`                 | <ol><ol><li>sub-numbered</li></ol></ol>   |
 | `;term`                          | <dt>**term**</dt>                         |
 | `:definition`                    | <dd>&emsp;definition</dd>                 |
+| `<ref>Text</ref>`                | <sup id=cite-1>[[1]](#ref-1)</sup>        |
+| `<references/>`                  | 1. <a id=ref-1>[↑](#cite-1)</a> Text      |
 | `[[internal link]]`              | [internal link](#internal_link)           |
 | `[[link\|display text]]`         | [display text](#link)                     |
 | `[external-link]`                | [[1]](#external-link)                     |
@@ -79,11 +81,18 @@ Any wiki templates (called using `{{template name}}`) must be inside the `templa
 | `{{#var:varname}}`               | text *(from memory)*                      |
 | `{{#var:varname\|default val}}`  | *(ditto but 'default val' if unset)*      |
 | `{{#switch:a\|a=1\|b=2\|c=3}}`   | 1                                         |
-| `{{#time:d-M-y\|2021-03-28}}`    | 28-Mar-21                                 |
+| `{{#time:dd/mm/yy\|2021-03-28}}` | 28/03/21                                  |
 | `{{lc:TEXT}}`                    | text                                      |
 | `{{ucfirst:text}}`               | Text                                      |
-| `<ref>Text</ref>`                | <sup id=cite-1>[[1]](#ref-1)</sup>        |
-| `<references/>`                  | 1. <a id=ref-1>[↑](#cite-1)</a> Text      |
+| `{{len:12345}}`                  | 5                                         |
+| `{{sub:string|2|4}}`             | ring                                      |
+| `{{pos:text|x}}`                 | 2                                         |
+| `{{padleft:text|5|_}}`           | _text                                     |
+| `{{padright:msg|5|_}}`           | msg__                                     |
+| `{{replace:Message|e|3}}`        | M3ssag3                                   |
+| `{{explode:A-B-C-D|-|2}}`        | C                                         |
+| `{{urlencode:t e x t}}`          | t%20e%20x%20t                             |
+| `{{urldecode:a%20b%27c}}`        | a b'c                                     |
 | `<noinclude>No</noinclude>`      | *(blank outside a template)*              |
 | `<onlyinclude>Yes</onlyinclude>` | Yes                                       |
 | `<includeonly>Yes</includeonly>` | Yes *(blank inside a template)*           |

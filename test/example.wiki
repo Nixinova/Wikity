@@ -4,6 +4,9 @@
 == Heading ==
 === Subheading ===
 == Broken heading ===
+====== Small heading ======
+
+__TOC__
 
 ''Italic''
 '''Bold'''
@@ -24,6 +27,8 @@
 : Root indent
 :: Subindent
 ::: Indented
+
+-----
 
 [[Link]]
 [[Link|Text]]
@@ -51,6 +56,18 @@ Non-parsed content &amp; tags.
 <div onclick="malicious"></div>
 </nowiki>
 
+`{{#lc:TEXT}}`             = text
+`{{#ucfirst:text}}`        = Text
+`{{#len:12345}}`           = 5
+`{{#sub:string|2|4}}`      = ring
+`{{#pos:text|x}}`          = 2
+`{{#padleft:text|5|_}}`    = _text
+`{{#padright:msg|5|_}}`    = msg__
+`{{#replace:Message|e|3}}` = M3ssag3
+`{{#explode:A-B-C-D|-|2}}` = C
+`{{#urlencode:t e x t}}`   = t%20e%20x%20t
+`{{#urldecode:a%20b%27c}}`  = a b'c
+
 {{#if: true | true text | false text }}
 {{ #vardefine: test | value }}
 [[{{ #var:test }}]]
@@ -60,8 +77,8 @@ Non-parsed content &amp; tags.
 | val = val!
 | #default = one
 }}
-{{#date: Y-m-d \m | 27 Mar 21}}
+{{#date: yyyy-mm-dd (ddd) 'm' | 27 Mar 21}}
 {{#vardefine: nested | {{#var: null | nil}} {{#vardefine: x | 1}} {{=}}.}}
 {{#var: nested}}
 
-<!-- {{displaytitle: Example}} -->
+{{displaytitle: Example Page}}

@@ -4,14 +4,9 @@ const formatter = require('html-formatter');
 const novasheets = require('novasheets');
 
 import { parse } from './parse';
+import { Config, Result } from './types';
 
 const OUT_FOLDER = 'wikity-out/';
-
-type Config = {
-    eleventy?: boolean,
-    defaultStyles?: boolean,
-    customStyles?: string,
-}
 
 export function compile(dir: string = '.', config: Config = {}): void {
     let stylesCreated = false;
@@ -19,14 +14,14 @@ export function compile(dir: string = '.', config: Config = {}): void {
     const files = glob.sync((dir || '.') + "/**/*.wiki", {});
     files.forEach((file: string) => {
         let data: string = fs.readFileSync(file, { encoding: 'utf8' });
+        let content: Result = parse(data);
+        let outText: string = content.toString();
 
         let [, folder, filename]: string[] = file.match(/^(.+?[\/\\])((?:templates[\/\\])?[^\/\\]+)$/) as RegExpMatchArray;
         let outFolder: string = (dir || folder || '.') + '/' + OUT_FOLDER;
         let outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
         let url: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase())
-        let displayTitle: string = url.replace('.html', '');
-
-        let outText = parse(data);
+        let displayTitle: string = content.metadata.displayTitle || url.replace('.html', '');
 
         // Eleventy configuration
         let frontMatter: string = '';
@@ -39,6 +34,30 @@ export function compile(dir: string = '.', config: Config = {}): void {
         }
 
         // Create HTML
+        let toc: string = '';
+        if (!content.metadata.notoc && (content.metadata.toc || (outText.match(/<h\d[^>]*>/g)?.length || 0) > 3)) {
+            let headings = Array.from(content.match(/<h\d[^>]*>.+?<\/h\d>/gs) || []);
+            headings.forEach(match => {
+                const text: string = match.replace(/\s*<\/?h\d[^>]*>\s*/g, '');
+                const lvl: number = +(match.match(/\d/g)?.[0] || -1);
+                toc += `${`<ol>`.repeat(lvl - 1)} <li> <a href="#${encodeURI(text.replace(/ /g, '_'))}">${text}</a> </li> ${`</ol>`.repeat(lvl - 1)}`;
+            });
+            toc = `
+                <div id="toc">
+                    <span id="toc-heading">
+                        <strong>Contents</strong>
+                        [<a href="javascript:void(0)" onclick="
+                            this.parentNode.parentNode.setAttribute('class', this.innerText === 'hide' ? 'toc-hidden' : '');
+                            this.innerText = this.innerText === 'hide' ? 'show' : 'hide';
+                        ">hide</a>]
+                    </span>
+                    <ol>${toc}</ol>
+                </div>
+            `;
+            if (outText.includes('<toc></toc>')) outText = outText.replace('<toc></toc>', toc);
+            else outText = outText.replace(/<h\d[^>]*>/, toc + '$&');
+        }
+
         let html = `
             <html>
                 <head>
@@ -46,11 +65,11 @@ export function compile(dir: string = '.', config: Config = {}): void {
                     <meta name="viewport" content="initial-scale=1.0, width=device-width">
                     <meta name="description" content="${data.substr(0, 256)}">
                     <title>${displayTitle}</title>
-                    <link rel="stylesheet" href="/wiki.css">
+                    <link id="default-styles" rel="stylesheet" href="/wiki.css">
                 </head>
                 <body>
                     <header>
-                        <h1>${displayTitle}</h1>
+                        <h1 id="page-title">${displayTitle}</h1>
                     </header>
                     <main>
                         <p>\n${outText}
@@ -68,7 +87,8 @@ export function compile(dir: string = '.', config: Config = {}): void {
             fs.mkdirSync(outFolder);
             fs.mkdirSync(outFolder + 'templates/');
         }
-        fs.writeFileSync(outFolder + outFilename, frontMatter + formatter.render(html), 'utf8');
+        let renderedHtml = formatter.render(html).replace(/(<\/\w+>)(\S)/g, '$1 $2');
+        fs.writeFileSync(outFolder + outFilename, frontMatter + renderedHtml, 'utf8');
 
         // Create site files
         if (stylesCreated) return;
@@ -87,6 +107,11 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 a.internal-link {color: #04a;} &:visited {color: #26d;}
                 a.external-link {color: #36b;} &:visited {color: #58d;} &::after {content: '\\1f855';}
                 a.redlink {color: #d33;} &:visited {color: #b44;}
+
+                #toc {display: inline-block; border: 1px solid #aab; padding: 8px; background-color: #f8f8f8; font-size: 95%;}
+                &-heading {display: block; text-align: center;}
+                & ol {margin: 0 0 0 1.3em;}
+                &.toc-hidden {height: 1em;} % ol {display: none;}
             `.replace(/^\s+/gm, ''));
         }
         if (config.customStyles) styles += config.customStyles;

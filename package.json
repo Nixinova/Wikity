@@ -1,6 +1,6 @@
 {
   "name": "wikity",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Wikitext as a templating language, with built-in Eleventy support.",
   "main": "src/index.js",
   "scripts": {
@@ -21,6 +21,8 @@
   "author": "Nixinova (https://nixinova.com)",
   "license": "ISC",
   "dependencies": {
+    "dateformat": "^4.5.1",
+    "escape-html": "^1.0.3",
     "glob": "^7.1.6",
     "html-formatter": "^0.1.9",
     "novasheets": "1.0.0-pre3"

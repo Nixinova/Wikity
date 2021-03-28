@@ -3,5 +3,5 @@ import { parse } from './parse';
 
 export = {
     compile,
-    parse,
+    parse: (data: string): string => parse(data).toString(),
 };
