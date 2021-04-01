@@ -12,26 +12,36 @@ Wikity is available [on npm](https://www.npmjs.com/package/wikity).
 
 ## API
 
-- `wikity.compile(directory?: string, options?: object)`
-  - Compile Wikitext files into HTML. Find outputted files in folder `wikity-out/`.
+### Node
+
+- `wikity.compile(folder?: string, options?: object): void`
+  - Compile all Wikitext (`.wiki`) files into HTML.
   - `directory?: string`
     - The folder to compile (default: `.`, the current directory).
   - `options?: object`
+    - `outputFolder?: string`
+      - Where outputted HTML files shall be placed (default: `wikity-out`).
+    - `templatesFolder?: string`
+      - What folder to place templates in (default: `'templates'`).
     - `eleventy?: boolean`
       - Whether [front matter](https://www.11ty.dev/docs/data-frontmatter/) will be added to the outputted HTML for Eleventy to read (default: `false`).
     - `defaultStyles?: boolean`
       - Whether to use default wiki styling (default: `true`).
     - `customStyles?: string`
       - Custom CSS to style the wiki pages (default: `''`).
-- `wikity.clean()`
-  - Clean up residual folders after compilation.
-
-Calling `wikity()` will compile all `.wiki` files into their corresponding `.html` versions.
-Outputted files are located in the `wikity-out/` directory.
+- `wikity.eleventyPlugin(folder?: string, options?: object): void`
+  - An implementation of `compile` for use with Eleventy's `addPlugin` API.
+- `wikity.parse(input: string): string`
+  - Parse raw wikitext input into HTML.
 
 ```js
 const wikity = require('wikity');
-wikity.compile(); // compile all .wiki files inside this directory
+
+// compile all .wiki files inside this directory
+wikity.compile();
+
+// parse wikitext from an input string
+let html = wikity.parse(`'''bold''' [[link|text]]`); // <b>bold</b> <a href="/link"...>text</a>
 ```
 
 Use Wikity along with Eleventy to compile your wiki files during the build process:
@@ -39,14 +49,28 @@ Use Wikity along with Eleventy to compile your wiki files during the build proce
 ```js
 // .eleventy.js (eleventy's configuration file)
 const wikity = require('wikity');
-wikity.compile('.', { eleventy: true });
+module.exports = function (eleventyConfig) {
+    eleventyConfig.addPlugin( () => wikity.eleventyPlugin() );
+}
+```
+
+### Command-line
+```cmd
+$ wikity help
+Display a help message
+$ wikity (compile|-c) [<folder>] [-o <folder>] [-t <folder>] [-e] [-d]
+Compile Wikity with various options
+$ wikity parse <input>
+Parse raw input into HTML
+$ wikity version
+Display the latest version of Wikity
 ```
 
 ## Usage
 
 Use [Wikitext](https://en.wikipedia.org/wiki/Help:Wikitext) (file extension `.wiki`) to create your pages.
 
-Any wiki templates (called using `{{template name}}`) must be inside the `templates/` folder.
+Any wiki templates (called using `{{template name}}`) must be inside the `templates/` folder by default.
 
 ### Wiki markup
 
@@ -75,6 +99,11 @@ Any wiki templates (called using `{{template name}}`) must be inside the `templa
 | `{{tp name\|arg=val}}`           | *(ditto but `{{{arg}}}` is set to 'val')* |
 | `{{{arg}}}`                      | *(value given by template)*               |
 | `{{{arg\|default val}}}`         | *(ditto but 'default val' if unset)*      |
+| `{\| style="margin:1em"`         | *table opening*                           |
+| `! Cell heading`                 | **Cell heading**                          |
+| `\|- class="new-row"`            | *new table row*                           |
+| `\| Cell content`                | Cell content                              |
+| `\|}`                            | *table closing*                           |
 | `{{#if:non-empty-string\|text}}` | text                                      |
 | `{{#ifeq:1\|2\|true\|false}}`    | false                                     |
 | `{{#vardefine:varname\|text}}`   | *(saved to memory)*                       |
@@ -82,17 +111,17 @@ Any wiki templates (called using `{{template name}}`) must be inside the `templa
 | `{{#var:varname\|default val}}`  | *(ditto but 'default val' if unset)*      |
 | `{{#switch:a\|a=1\|b=2\|c=3}}`   | 1                                         |
 | `{{#time:dd/mm/yy\|2021-03-28}}` | 28/03/21                                  |
-| `{{lc:TEXT}}`                    | text                                      |
-| `{{ucfirst:text}}`               | Text                                      |
-| `{{len:12345}}`                  | 5                                         |
-| `{{sub:string|2|4}}`             | ring                                      |
-| `{{pos:text|x}}`                 | 2                                         |
-| `{{padleft:text|5|_}}`           | _text                                     |
-| `{{padright:msg|5|_}}`           | msg__                                     |
-| `{{replace:Message|e|3}}`        | M3ssag3                                   |
-| `{{explode:A-B-C-D|-|2}}`        | C                                         |
-| `{{urlencode:t e x t}}`          | t%20e%20x%20t                             |
-| `{{urldecode:a%20b%27c}}`        | a b'c                                     |
+| `{{#lc:TEXT}}`                   | text                                      |
+| `{{#ucfirst:text}}`              | Text                                      |
+| `{{#len:12345}}`                 | 5                                         |
+| `{{#sub:string\|2\|4}}`          | ring                                      |
+| `{{#pos:text\|x}}`               | 2                                         |
+| `{{#padleft:text\|5\|_}}`        | _text                                     |
+| `{{#padright:msg\|5\|_}}`        | msg__                                     |
+| `{{#replace:Message\|e\|3}}`     | M3ssag3                                   |
+| `{{#explode:A-B-C-D\|-\|2}}`     | C                                         |
+| `{{#urlencode:t e x t}}`         | t%20e%20x%20t                             |
+| `{{#urldecode:a%20b%27c}}`       | a b'c                                     |
 | `<noinclude>No</noinclude>`      | *(blank outside a template)*              |
 | `<onlyinclude>Yes</onlyinclude>` | Yes                                       |
 | `<includeonly>Yes</includeonly>` | Yes *(blank inside a template)*           |

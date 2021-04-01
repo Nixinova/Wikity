@@ -1,9 +1,18 @@
 # Changelog
 
+## 1.2.0
+*2021-04-01*
+- Added function `eleventyPlugin()` for use with Eleventy's `addPlugin` method.
+- Added configuration option `outputFolder` to configure the folder the compiled HTML files are placed in.
+- Added configuration option `templatesFolder` to configure the folder templates are placed in.
+- Added CLI options `--outputFolder`, `--templatesFolder`, `--eleventy`, and `--defaultStyles` to change configuration options.
+- Added support for tables.
+- Added a warning when the parser detects non-repetition-based `#time` function syntax is being used.
+
 ## 1.1.0
 *2021-03-28*
 - Added `parse` CLI command to implement `parse()`.
-- Added support for a table of contents.
+- Added a generated table of contents if there are over 4 headings.
 - Added support for `nowiki` tag.
 - Added support for `onlyinclude`, `includeonly`, and `noinclude` tags in templates.
 - Added support for magic words `__TOC__`, `__FORCETOC__`, `__NOTOC__`, and `__NOINDEX__`.

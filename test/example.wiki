@@ -39,6 +39,7 @@ __TOC__
 
 {{subst}}
 {{subst|Hello!}}
+{{subst|named=Named}}
 {{nonexistent template}}
 
 <script src="malicious.js"></script>
@@ -49,6 +50,14 @@ __TOC__
 ```
 code block
 ```
+
+{| class="table"
+! Heading
+! Heading
+|- class="row"
+| Cell
+| Cell
+|}
 
 <nowiki>
 Non-parsed content &amp; tags.

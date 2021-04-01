@@ -2,15 +2,12 @@ const fs = require('fs');
 const htmlEscape = require('escape-html');
 const dateFormat = require('dateformat');
 
-import { Result, Metadata } from './types';
+import { Config, Result, Metadata, RegExpBuilder as re, RawString as r } from './common';
 
-const re = (regex: string, flag: string = 'mgi') =>
-    RegExp(regex.replace(/ /g, '').replace(/\|\|.+?\|\|/g, ''), flag);
-const r = String.raw;
 const MAX_RECURSION: number = 50;
-const arg: string = `\s*([^|}]+?)\s*`;
+const arg: string = r`\s*([^|}]+?)\s*`;
 
-export function parse(data: string): Result {
+export function parse(data: string, config: Config = {}): Result {
 
     const vars: Metadata = {};
     const metadata: Metadata = {};
@@ -61,7 +58,7 @@ export function parse(data: string): Result {
             .replace(re(r`{{ \s* #? ucfirst: ${arg} }}`), (_, m) => m[0].toUpperCase() + m.substr(1))
             .replace(re(r`{{ \s* #? len: ${arg} }}`), (_, m) => m.length)
             .replace(re(r`{{ \s* #? pos: ${arg} \|${arg} (?: \s*\|${arg} )? }}`), (_, find, str, n = 0) => find.substr(n).indexOf(str))
-            .replace(re(r`{{ \s* #? sub: ${arg} \|${arg} (?:\|${arg})? }}`), (_, str, from, len) => str.substr(+from-1, +len))
+            .replace(re(r`{{ \s* #? sub: ${arg} \|${arg} (?:\|${arg})? }}`), (_, str, from, len) => str.substr(+from - 1, +len))
             .replace(re(r`{{ \s* #? padleft: ${arg} \|${arg} \|${arg} }}`), (_, str, n, char) => str.padStart(+n, char))
             .replace(re(r`{{ \s* #? padright: ${arg} \|${arg} \|${arg} }}`), (_, str, n, char) => str.padEnd(+n, char))
             .replace(re(r`{{ \s* #? replace: ${arg} \|${arg} \|${arg} }}`), (_, str, find, rep) => str.split(find).join(rep))
@@ -80,7 +77,7 @@ export function parse(data: string): Result {
                         vars[args[0]] = args[1] || '';
                         return '';
                     case '#var':
-                        if (re(r`{{ \s* #vardefine \s* : \s* ${args[0]}`).test(outText)) return _;// wait until var is set
+                        if (re(r`{{ \s* #vardefine \s* : \s* ${args[0]}`).test(outText)) return _; // wait until var is set
                         return vars[args[0]] || args[1] || '';
                     case '#switch':
                         return args.slice(1)
@@ -88,14 +85,20 @@ export function parse(data: string): Result {
                             .filter(duo => args[0] === duo[0].replace('#default', args[0]))[0][1];
                     case '#time':
                     case '#date':
-                    case '#datetime': return dateFormat(args[1] ? new Date(args[1]) : new Date(), args[0])
+                    case '#datetime':
+                        // make sure the characters are not inside a string
+                        let parsedMatch = args[0].replace(/".+?"/g, '').replace(/'.+?'/g, '');
+                        if (/[abcefgijkqruvx]/i.test(parsedMatch)) {
+                            console.warn(`<Wikity> [WARN] Wikity does not use Wikipedia's #time function syntax. Use repetition-based formatting instead.`);
+                        }
+                        return dateFormat(args[1] ? new Date(args[1]) : new Date(), args[0]);
                 }
             })
 
             // Templates: {{template}}
             .replace(re(r`{{ \s* ([^#}|]+?) (\|[^}]+)? }} (?!})`), (_, title, params = '') => {
                 if (/{{/.test(params)) return _;
-                const page: string = 'templates/' + title.trim().replace(/ /g, '_');
+                const page: string = (config.templatesFolder || 'templates')+ '/' + title.trim().replace(/ /g, '_');
 
                 // Retrieve template content
                 let content: string = '';
@@ -153,6 +156,13 @@ export function parse(data: string): Result {
             .replace(re(r`^ ; (.+) $`), '<dl><dt>$1</dt></dl>')
             .replace(re(r`^ (:+) (.+?) $`), (_, lvl, txt) => `${'<dl>'.repeat(lvl.length)}<dd>${txt}</dd>${'</dl>'.repeat(lvl.length)}`)
             .replace(re(r`</dl> (\s*?) <dl>`), '$1')
+
+            // Tables: {|, |, |-, |}
+            .replace(re(r`^ \{\| (.*?) $`), (_, attrs) => `<table ${attrs}><tr>`)
+            .replace(re(r`^ ! ([^]+?) (?= \n^[!|] )`), (_, content) => `<th>${content}</th>`)
+            .replace(re(r`^ \|[^-}] ([^]*?) (?= \n^[!|] )`), (_, content) => `<td>${content}</td>`)
+            .replace(re(r`^ \|- (.*?) $`), (_, attrs) => `</tr><tr ${attrs}>`)
+            .replace(re(r`^ \|\}`), `</tr></table>`)
 
             // References: <ref></ref>, <references/>
             .replace(re(r`<ref> (.+?) </ref>`), (_, text) => {

@@ -1,4 +1,0 @@
-wikity-out/
-test/
-src/*.ts
-!src/*.d.ts

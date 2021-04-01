@@ -3,3 +3,4 @@ node_modules/
 wikity-out/
 
 src/*.js
+src/*.d.ts
