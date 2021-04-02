@@ -1,3 +1,7 @@
+[![Latest version](https://img.shields.io/github/v/release/Nixinova/Wikity?label=latest%20version&style=flat-square)](https://github.com/Nixinova/Wikity/releases)
+[![Last updated](https://img.shields.io/github/release-date/Nixinova/Wikity?label=updated&style=flat-square)](https://github.com/Nixinova/Wikity/releases)
+[![npm downloads](https://img.shields.io/npm/dt/wikity?logo=npm)](https://www.npmjs.com/package/wikity)
+
 # Wikity
 
 **Wikity** is a tool that allows you to use Wikitext (used by Wikipedia, Fandom, etc) as a templating language to create HTML pages, useful in build tools such as [Eleventy](https://11ty.dev).
@@ -31,7 +35,7 @@ Wikity is available [on npm](https://www.npmjs.com/package/wikity).
       - Custom CSS to style the wiki pages (default: `''`).
 - `wikity.eleventyPlugin(folder?: string, options?: object): void`
   - An implementation of `compile` for use with Eleventy's `addPlugin` API.
-- `wikity.parse(input: string): string`
+- `wikity.parse(input: string, {templatesFolder?: string}?): string`
   - Parse raw wikitext input into HTML.
 
 ```js
@@ -41,7 +45,7 @@ const wikity = require('wikity');
 wikity.compile();
 
 // parse wikitext from an input string
-let html = wikity.parse(`'''bold''' [[link|text]]`); // <b>bold</b> <a href="/link"...>text</a>
+let html = wikity.parse(`'''bold''' [[link|text]]`); // <b>bold</b> <a href="link"...>text</a>
 ```
 
 Use Wikity along with Eleventy to compile your wiki files during the build process:
@@ -50,7 +54,10 @@ Use Wikity along with Eleventy to compile your wiki files during the build proce
 // .eleventy.js (eleventy's configuration file)
 const wikity = require('wikity');
 module.exports = function (eleventyConfig) {
-    eleventyConfig.addPlugin( () => wikity.eleventyPlugin() );
+    const wikiFolder = '.'; // current directory
+    const wikityOptions = {templatesFolder: 'templates'}; // set as needed
+    const wikityPlugin = () => wikity.eleventyPlugin(wikiFolder, wikityOptions);
+    eleventyConfig.addPlugin(wikityPlugin);
 }
 ```
 
@@ -58,7 +65,7 @@ module.exports = function (eleventyConfig) {
 ```cmd
 $ wikity help
 Display a help message
-$ wikity (compile|-c) [<folder>] [-o <folder>] [-t <folder>] [-e] [-d]
+$ wikity compile [<folder>] [-o <folder>] [-t <folder>] [-e] [-d]
 Compile Wikity with various options
 $ wikity parse <input>
 Parse raw input into HTML

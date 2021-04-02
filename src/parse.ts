@@ -2,10 +2,15 @@ const fs = require('fs');
 const htmlEscape = require('escape-html');
 const dateFormat = require('dateformat');
 
-import { Config, Result, Metadata, RegExpBuilder as re, RawString as r } from './common';
+import { Config, Result, Metadata, RegExpBuilder as re } from './common';
 
-const MAX_RECURSION: number = 50;
+const r = String.raw;
+const MAX_RECURSION: number = 20;
 const arg: string = r`\s*([^|}]+?)\s*`;
+
+export function rawParse(data: string, config: Config = {}): string {
+    return parse(data, config).toString();
+}
 
 export function parse(data: string, config: Config = {}): Result {
 
@@ -98,7 +103,7 @@ export function parse(data: string, config: Config = {}): Result {
             // Templates: {{template}}
             .replace(re(r`{{ \s* ([^#}|]+?) (\|[^}]+)? }} (?!})`), (_, title, params = '') => {
                 if (/{{/.test(params)) return _;
-                const page: string = (config.templatesFolder || 'templates')+ '/' + title.trim().replace(/ /g, '_');
+                const page: string = (config.templatesFolder || 'templates') + '/' + title.trim().replace(/ /g, '_');
 
                 // Retrieve template content
                 let content: string = '';
@@ -118,12 +123,12 @@ export function parse(data: string, config: Config = {}): Result {
                 const argMatch = (arg: string): RegExp => re(r`{{{ \s* ${arg} (?:\|([^}]*))? \s* }}}`);
                 let args: string[] = params.split('|').slice(1);
                 for (let i in args) {
-                    let parts = args[i].split('=')
+                    let parts = args[i].split('=');
                     let [arg, val]: string[] = parts[1] ? [parts[0], ...parts.slice(1)] : [(+i + 1) + '', parts[0]];
                     content = content.replace(argMatch(arg), (_, m) => val || m || '');
                 }
                 for (let i = 1; i <= 10; i++) {
-                    content = content.replace(argMatch(i + ''), '$1');
+                    content = content.replace(argMatch(arg), '$2');
                 }
 
                 return content;
@@ -137,7 +142,7 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`^ (=+) \s* (.+?) \s* \1 \s* $`), (_, lvl, txt) => `<h${lvl.length} id="${encodeURI(txt.replace(/ /g, '_'))}">${txt}</h${lvl.length}>`)
 
             // Internal links: [[Page]] and [[Page|Text]]
-            .replace(re(r`\[\[ ([^\]|]+?) \]\]`), `<a class="internal-link" title="$1" href="/$1">$1</a>`)
+            .replace(re(r`\[\[ ([^\]|]+?) \]\]`), `<a class="internal-link" title="$1" href="$1">$1</a>`)
             .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), `<a class="internal-link" title="$1" href="/$1">$2</a>`)
             .replace(re(r`(</a>)([a-z]+)`), '$2$1')
 

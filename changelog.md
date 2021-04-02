@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.1
+*2021-04-02*
+- Added previously-unimplemented `config` option to `parse()` to configure the `templatesFolder`.
+- Changed table of contents to not require default styling to collapse.
+- Fixed internal links being incorrectly root-relative.
+- Fixed templates output folder not being created on initialisation.
+- Fixed unset arguments not being removed from the output.
+
 ## 1.2.0
 *2021-04-01*
 - Added function `eleventyPlugin()` for use with Eleventy's `addPlugin` method.

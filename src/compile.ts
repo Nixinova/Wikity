@@ -1,9 +1,16 @@
 const fs = require('fs');
 const glob = require('glob');
+const dedent = require('dedent');
 const formatter = require('html-formatter');
 
 import { parse } from './parse';
-import { Config, Result, RegExpBuilder as re, RawString as r } from './common';
+import { Config, Result, RegExpBuilder as re } from './common';
+
+const r = String.raw;
+
+export function eleventyCompile(dir: string = '.', config: Config = {}): void {
+    compile(dir, { eleventy: true, ...config });
+}
 
 export function compile(dir: string = '.', config: Config = {}): void {
     let stylesCreated = false;
@@ -15,7 +22,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         let outText: string = content.toString();
         const templatesFolder = config.templatesFolder || 'templates';
 
-        let [, folder, filename]: string[] = file.match(re(r`^(.+?[\/\\]) ((?:${templatesFolder}[\/\\])?[^\/\\]+)$`,'')) as RegExpMatchArray;
+        let [, folder, filename]: string[] = file.match(re(r`^(.+?[\/\\]) ((?:${templatesFolder}[\/\\])?[^\/\\]+)$`, '')) as RegExpMatchArray;
         let outFolder: string = (dir || folder || '.') + '/' + (config.outputFolder || 'wikity-out') + '/';
         let outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
         let url: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase())
@@ -24,11 +31,11 @@ export function compile(dir: string = '.', config: Config = {}): void {
         // Eleventy configuration
         let frontMatter: string = '';
         if (config.eleventy) {
-            frontMatter = `
+            frontMatter = dedent`
                 ---
                 permalink: /wiki/${url}
                 ---
-            `.trimStart().replace(/^\s+/gm, '');
+            `;
         }
 
         // Create HTML
@@ -40,12 +47,12 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 const lvl: number = +(match.match(/\d/g)?.[0] || -1);
                 toc += `${`<ol>`.repeat(lvl - 1)} <li> <a href="#${encodeURI(text.replace(/ /g, '_'))}">${text}</a> </li> ${`</ol>`.repeat(lvl - 1)}`;
             });
-            toc = `
+            toc = dedent`
                 <div id="toc">
                     <span id="toc-heading">
                         <strong>Contents</strong>
                         [<a href="javascript:void(0)" onclick="
-                            this.parentNode.parentNode.setAttribute('class', this.innerText === 'hide' ? 'toc-hidden' : '');
+                            document.querySelector('#toc ol').setAttribute('style', this.innerText === 'hide' ? 'display: none;' : '');
                             this.innerText = this.innerText === 'hide' ? 'show' : 'hide';
                         ">hide</a>]
                     </span>
@@ -56,7 +63,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
             else outText = outText.replace(/<h\d[^>]*>/, toc + '$&');
         }
 
-        let html = `
+        let html = dedent`
             <html>
                 <head>
                     <meta charset="utf-8">
@@ -78,22 +85,22 @@ export function compile(dir: string = '.', config: Config = {}): void {
                     </footer>
                 </body>
             </html>
-        `.trim().replace(/^\s{1,20}/gm, '');
+        `;
 
         // Write to file
         if (!fs.existsSync(outFolder)) {
             fs.mkdirSync(outFolder);
-            fs.mkdirSync(outFolder + 'templates/');
+            fs.mkdirSync(outFolder + templatesFolder + '/');
         }
         let renderedHtml = formatter.render(html).replace(/(<\/\w+>)(\S)/g, '$1 $2');
-        fs.writeFileSync(outFolder + outFilename, frontMatter + renderedHtml, 'utf8');
+        fs.writeFileSync(outFolder + outFilename, frontMatter + '\n' + renderedHtml, 'utf8');
 
         // Create site files
         if (stylesCreated) return;
         stylesCreated = true;
         let styles: string = '';
         if (config.defaultStyles !== false) {
-            styles += `
+            styles += dedent`
                 body {font-family: sans-serif; margin: 4em; max-width: 1000px; background: #eee;}
                 main {margin: 3em -1em; background: #fff; padding: 1em;}
                 h1, h2 {margin-bottom: 0.6em; font-weight: normal; border-bottom: 1px solid #a2a9b1;}
@@ -105,19 +112,24 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 a.internal-link {color: #04a;}
                 a.internal-link:visited {color: #26d;}
                 a.external-link {color: #36b;}
-                &:visited {color: #58d;}
-                a.external-link&::after {content: '\\1f855';}
+                a.external-link:visited {color: #58d;}
+                a.external-link::after {content: '\1f855';}
                 a.redlink {color: #d33;}
                 a.redlink:visited {color: #b44;}
 
                 #toc {display: inline-block; border: 1px solid #aab; padding: 8px; background-color: #f8f8f8; font-size: 95%;}
                 #toc-heading {display: block; text-align: center;}
                 #toc ol {margin: 0 0 0 1.3em;}
-                #toc.toc-hidden {height: 1em;} % ol {display: none;}
-            `.replace(/^\s+/gm, '');
+            `;
         }
         if (config.customStyles) styles += config.customStyles;
-        fs.writeFileSync(outFolder + 'wiki.css.njk', '---\npermalink: /wiki.css\n---\n' + styles);
+        let cssOutput = dedent`
+            ---
+            permalink: /wiki.css
+            ---
+            ${styles}
+        `;
+        fs.writeFileSync(outFolder + 'wiki.css.njk', cssOutput);
 
     });
 }

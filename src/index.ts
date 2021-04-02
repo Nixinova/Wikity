@@ -1,9 +1,8 @@
-import { compile } from './compile';
-import { parse } from './parse';
-import { plugin } from './eleventy';
+import { compile, eleventyCompile } from './compile';
+import { rawParse } from './parse';
 
 export = {
-    compile,
-    parse: (data: string): string => parse(data).toString(),
-    eleventyPlugin: plugin,
+    parse: rawParse,
+    compile: compile,
+    eleventyPlugin: eleventyCompile, // deprecated
 };

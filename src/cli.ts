@@ -2,7 +2,7 @@
 
 import wikity from './index';
 
-const VERSION = '1.2.0';
+const VERSION = '1.2.1';
 
 const indent = (n: number): string => ' '.repeat(n * 4);
 const usage = (command: string, ...desc: string[]): void => {
@@ -20,7 +20,7 @@ else if (arg(1).includes('h')) {
     usage(`wikity (help|-h)`,
         `Display this help message.`,
     );
-    usage(`wikity (compile|-c) [<folder>] [-o <folder>] [-t <folder>] [-e] [-d]`,
+    usage(`wikity compile [<folder>] [-o <folder>] [-t <folder>] [-e] [-d]`,
         `Compile wikitext files from a given folder.`,
         `  [<folder>]\n${indent(3.5)}Input folder ('.' (current folder) if unset).`,
         `  (-o|--outputFolder) <folder>\n${indent(3.5)}Folder that compiled HTML files are placed in ('wikity-out' if unset).`,

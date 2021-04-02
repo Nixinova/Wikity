@@ -19,5 +19,3 @@ export class Result extends String {
 export function RegExpBuilder(regex: string, flag: string = 'mgi') {
     return RegExp(regex.replace(/ /g, '').replace(/\|\|.+?\|\|/g, ''), flag);
 }
-
-export const RawString = String.raw;
