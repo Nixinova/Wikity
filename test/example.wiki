@@ -33,6 +33,9 @@ __TOC__
 [[Link]]
 [[Link|Text]]
 
+[[File:Example.png|alt=Example]]
+[[File:Example.png|200px|thumb|right|alt=Alt text|Example text]]
+
 [https://github.com]
 [https://google.com External link]
 [not a link]
@@ -51,12 +54,15 @@ __TOC__
 code block
 ```
 
-{| class="table"
+{| class="wikitable"
+|+ Caption
 ! Heading
 ! Heading
 |- class="row"
 | Cell
 | Cell
+|-
+| Inline || Inline
 |}
 
 <nowiki>

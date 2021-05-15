@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import wikity from './index';
-
-const VERSION = '1.2.1';
+import { VERSION } from './common';
 
 const indent = (n: number): string => ' '.repeat(n * 4);
 const usage = (command: string, ...desc: string[]): void => {
@@ -20,11 +19,12 @@ else if (arg(1).includes('h')) {
     usage(`wikity (help|-h)`,
         `Display this help message.`,
     );
-    usage(`wikity compile [<folder>] [-o <folder>] [-t <folder>] [-e] [-d]`,
+    usage(`wikity compile [<folder>] [-o <folder>] [-t <folder>] -i <folder>] [-e] [-d]`,
         `Compile wikitext files from a given folder.`,
         `  [<folder>]\n${indent(3.5)}Input folder ('.' (current folder) if unset).`,
         `  (-o|--outputFolder) <folder>\n${indent(3.5)}Folder that compiled HTML files are placed in ('wikity-out' if unset).`,
         `  (-t|--templatesFolder) <folder>\n${indent(3.5)}Where to place wiki templates ('templates' if unset).`,
+        `  (-i|--imagesFolder) <folder>\n${indent(3.5)}Where to place wiki images ('images' if unset).`,
         `  (-e|--eleventy)\n${indent(3.5)}Compiles files with Eleventy front matter (false if unset).`,
         `  (-d|--defaultStyles)\n${indent(3.5)}Add default wiki styling to all pages (true if unset).`,
     )
@@ -36,13 +36,16 @@ else if (arg(1).includes('h')) {
     );
 }
 else if (arg(1).includes('c')) {
-    const configArgs = args.slice(2);
-    const folder = arg(2) || '.';
-    const outputFolder = configArgs.join(' ').includes('-o') && configArgs.filter((_, i) => configArgs[i - 1]?.includes('-o')).join(' ') || '';
-    const templatesFolder = configArgs.join(' ').includes('-t') && configArgs.filter((_, i) => configArgs[i - 1]?.includes('-t')).join(' ') || '';
-    const eleventy = configArgs.join(' ').includes('-e');
-    const defaultStyles = configArgs.join(' ').includes('-d');
-    wikity.compile(folder, { outputFolder, templatesFolder, eleventy, defaultStyles });
+    const configArgs: string[] = args.slice(2);
+    const argsList: string = configArgs.join(' ');
+    const getArgContent = (arg: RegExp) => arg.test(argsList) && configArgs.filter((_, i) => arg.test(configArgs[i - 1])).join(' ') || '';
+    const folder: string = arg(2) || '.';
+    const outputFolder: string = getArgContent(/^-+o/);
+    const templatesFolder: string = getArgContent(/^-+t/);
+    const imagesFolder: string = getArgContent(/^-+i/);
+    const eleventy: boolean = /^-+e/.test(argsList);
+    const defaultStyles: boolean = /^-+d/.test(argsList);
+    wikity.compile(folder, { outputFolder, templatesFolder, imagesFolder, eleventy, defaultStyles });
 }
 else if (arg(1).includes('p')) {
     const input = arg(2);

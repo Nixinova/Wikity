@@ -19,24 +19,25 @@ Wikity is available [on npm](https://www.npmjs.com/package/wikity).
 ### Node
 
 - `wikity.compile(folder?: string, options?: object): void`
-  - Compile all Wikitext (`.wiki`) files into HTML.
-  - `directory?: string`
-    - The folder to compile (default: `.`, the current directory).
-  - `options?: object`
-    - `outputFolder?: string`
-      - Where outputted HTML files shall be placed (default: `wikity-out`).
-    - `templatesFolder?: string`
-      - What folder to place templates in (default: `'templates'`).
-    - `eleventy?: boolean`
-      - Whether [front matter](https://www.11ty.dev/docs/data-frontmatter/) will be added to the outputted HTML for Eleventy to read (default: `false`).
-    - `defaultStyles?: boolean`
-      - Whether to use default wiki styling (default: `true`).
-    - `customStyles?: string`
-      - Custom CSS to style the wiki pages (default: `''`).
+  - Compile all Wikitext (`.wiki`) files from an input folder (defaults to the current directory, `.`) into HTML.
 - `wikity.eleventyPlugin(folder?: string, options?: object): void`
-  - An implementation of `compile` for use with Eleventy's `addPlugin` API.
-- `wikity.parse(input: string, {templatesFolder?: string}?): string`
-  - Parse raw wikitext input into HTML.
+  - An implementation of `compile()` for use with Eleventy's `addPlugin` API. Identical to `compile()` except that option `eleventy` is `true` by default.
+- `wikity.parse(input: string, options?: object): string`
+  - Parse raw wikitext input into HTML. Only option available is `templatesFolder`.
+
+- **Options**:
+  - `outputFolder?: string`
+    - Where outputted HTML files shall be placed (default: `wikity-out`).
+  - `templatesFolder?: string`
+    - What folder to place templates in (default: `'templates'`).
+  - `imagesFolder?: string`
+    - What folder to place images in (default: `'images'`). Make sure to pass through this folder to your build output if applicable.
+- `eleventy?: boolean`
+    - Whether [front matter](https://www.11ty.dev/docs/data-frontmatter/) will be added to the outputted HTML for Eleventy to read (default: `false`).
+  - `defaultStyles?: boolean`
+    - Whether to use default wiki styling (default: `true`).
+  - `customStyles?: string`
+    - Custom CSS to style the wiki pages (default: `''`).
 
 ```js
 const wikity = require('wikity');
@@ -55,9 +56,10 @@ Use Wikity along with Eleventy to compile your wiki files during the build proce
 const wikity = require('wikity');
 module.exports = function (eleventyConfig) {
     const wikiFolder = '.'; // current directory
-    const wikityOptions = {templatesFolder: 'templates'}; // set as needed
+    const wikityOptions = {templatesFolder: 'templates', imagesFolder: 'images'}; // set as needed
     const wikityPlugin = () => wikity.eleventyPlugin(wikiFolder, wikityOptions);
     eleventyConfig.addPlugin(wikityPlugin);
+    eleventyConfig.addPassthroughCopy({[imagesFolder]: 'wiki/' + imagesFolder}); // Eleventy does not pass through images by default
 }
 ```
 
@@ -78,6 +80,7 @@ Display the latest version of Wikity
 Use [Wikitext](https://en.wikipedia.org/wiki/Help:Wikitext) (file extension `.wiki`) to create your pages.
 
 Any wiki templates (called using `{{template name}}`) must be inside the `templates/` folder by default.
+Any files must be inside the `images/` folder by default.
 
 ### Wiki markup
 
@@ -102,6 +105,7 @@ Any wiki templates (called using `{{template name}}`) must be inside the `templa
 | `[[link\|display text]]`         | [display text](#link)                     |
 | `[external-link]`                | [[1]](#external-link)                     |
 | `[external-link display text]`   | [display text](#external-link)            |
+| `[[File:Example.png\|Caption.]]` | ![Caption](Example.png)                   |
 | `{{tp name}}`                    | *(contents of `templates/tp_name.wiki`)*  |
 | `{{tp name\|arg=val}}`           | *(ditto but `{{{arg}}}` is set to 'val')* |
 | `{{{arg}}}`                      | *(value given by template)*               |

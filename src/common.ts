@@ -6,6 +6,7 @@ export type Config = {
     defaultStyles?: boolean,
     customStyles?: string,
     templatesFolder?: string,
+    imagesFolder?: string,
 }
 
 export class Result extends String {
@@ -19,3 +20,5 @@ export class Result extends String {
 export function RegExpBuilder(regex: string, flag: string = 'mgi') {
     return RegExp(regex.replace(/ /g, '').replace(/\|\|.+?\|\|/g, ''), flag);
 }
+
+export const VERSION = '1.3.0';

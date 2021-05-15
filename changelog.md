@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0
+*2021-05-16*
+- Added configuration option `imagesFolder` to configure the folder that images are placed in.
+- Added support for images using the `[[File:Image.png|options|caption]]` syntax.
+- Added `class="wikitable"` table styling.
+- Fixed a crash occurring when the templates folder did not exist when compiling.
+
 ## 1.2.1
 *2021-04-02*
 - Added previously-unimplemented `config` option to `parse()` to configure the `templatesFolder`.

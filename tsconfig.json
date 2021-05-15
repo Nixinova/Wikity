@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
     /* More info: https://aka.ms/tsconfig.json */
+    /* Examples: https://github.com/tsconfig/bases */
 
     /* Basic Options */
     //"incremental": true,
-    "target": "es2017",
+    "target": "es2019",
     "module": "commonjs",
     //"lib": [],
     //"allowJs": true,
