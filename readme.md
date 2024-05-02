@@ -4,13 +4,15 @@
 
 # Wikity
 
-**Wikity** is a tool that allows you to use Wikitext (used by Wikipedia, Fandom, etc) as a templating language to create HTML pages, useful in build tools such as [Eleventy](https://11ty.dev).
+**Wikity** is a tool that allows you to use Wikitext (used by Wikipedia, Fandom, etc) as a templating language to create HTML pages.
 
-**Currently works only with Eleventy <1.0.0**
+This package comes with built-in support for compilation using [Eleventy](https://11ty.dev).
+(Currently only works with version **<1.0.0**.)
 
 ## Install
 
 Wikity is available [on npm](https://www.npmjs.com/package/wikity).
+Install locally to use in a Node package or install globally for use from the command-line.
 
 | Local install        | Global install          |
 | -------------------- | ----------------------- |
@@ -22,25 +24,25 @@ Wikity is available [on npm](https://www.npmjs.com/package/wikity).
 
 - `wikity.compile(folder?: string, options?: object): void`
   - Compile all Wikitext (`.wiki`) files from an input folder (defaults to the current directory, `.`) into HTML.
-- `wikity.eleventyPlugin(folder?: string, options?: object): void`
-  *(deprecated)*
-  - An implementation of `compile()` for use with Eleventy's `addPlugin` API. Identical to `compile()` except that option `eleventy` is `true` by default.
+    (See below for available options.)
 - `wikity.parse(input: string, options?: object): string`
-  - Parse raw wikitext input into HTML. Only option available is `templatesFolder`.
+  - Parse raw wikitext input into HTML. Only option available is `templatesFolder` (see description below).
 
 - **Options**:
-  - `outputFolder?: string`
-    - Where outputted HTML files shall be placed (default: `wikity-out`).
-  - `templatesFolder?: string`
-    - What folder to place templates in (default: `'templates'`).
-  - `imagesFolder?: string`
-    - What folder to place images in (default: `'images'`). Make sure to pass through this folder to your build output if applicable.
-  - `eleventy?: boolean`
+  - `eleventy: boolean = false`
     - Whether [front matter](https://www.11ty.dev/docs/data-frontmatter/) will be added to the outputted HTML for Eleventy to read (default: `false`).
-  - `defaultStyles?: boolean`
-    - Whether to use default wiki styling (default: `true`).
-  - `customStyles?: string`
-    - Custom CSS to style the wiki pages (default: `''`).
+      (**This parameter *must* be set to `true` if you want to use this with Eleventy.**)
+  - `outputFolder: string = 'wikity-out'`
+    - Where outputted HTML files shall be placed.
+  - `templatesFolder: string = 'templates'`
+    - What folder to place templates in.
+  - `imagesFolder: string = 'images'`
+    - What folder to place images in.
+      (Make sure to pass-through this folder to your build output if using Eleventy.)
+  - `defaultStyles: boolean = true`
+    - Whether to use default wiki styling.
+  - `customStyles: string = ''`
+    - Custom CSS styles to add to the wiki pages.
 
 #### Example
 
