@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-import wikity from './index';
-import { VERSION } from './common';
+const { VERSION } = require('../package.json');
 
+import wikity from './index';
+
+// Helper functions
 const indent = (n: number): string => ' '.repeat(n * 4);
 const usage = (command: string, ...desc: string[]): void => {
     console.log('\n' + indent(2) + command);
@@ -11,10 +13,15 @@ const usage = (command: string, ...desc: string[]): void => {
 const arg = (n: number): string => process.argv[n + 1] || '';
 const args = process.argv.slice(1);
 
+// Run CLI
 if (!arg(1)) {
+    // No arguments
+
     console.log('Type `wikity help` for a list of commands.');
 }
 else if (arg(1).includes('h')) {
+    // Show help message
+
     console.log(`\n${indent(1)}Wikity CLI commands:`);
     usage(`wikity (help|-h)`,
         `Display this help message.`,
@@ -36,24 +43,40 @@ else if (arg(1).includes('h')) {
     );
 }
 else if (arg(1).includes('c')) {
+    // Run compilation
+
     const configArgs: string[] = args.slice(2);
     const argsList: string = configArgs.join(' ');
+
+    // retrieve item from arguments list
     const getArgContent = (arg: RegExp) => arg.test(argsList) && configArgs.filter((_, i) => arg.test(configArgs[i - 1])).join(' ') || '';
+
+    // Fetch user-supplied arguments
     const folder: string = arg(2) || '.';
     const outputFolder: string = getArgContent(/^-+o/);
     const templatesFolder: string = getArgContent(/^-+t/);
     const imagesFolder: string = getArgContent(/^-+i/);
     const eleventy: boolean = /^-+e/.test(argsList);
     const defaultStyles: boolean = /^-+d/.test(argsList);
+
     wikity.compile(folder, { outputFolder, templatesFolder, imagesFolder, eleventy, defaultStyles });
 }
 else if (arg(1).includes('p')) {
+    // Run parsing
+
+    // second argument is inputted text
     const input = arg(2);
-    console.log(wikity.parse(input));
+
+    const output = wikity.parse(input);
+    console.log(output);
 }
 else if (arg(1).includes('v')) {
+    // Show version
+
     console.log('The current version of Wikity is ' + VERSION);
 }
 else {
+    // Unknown command
+
     console.log('Unknown command; type `wikity help` for help');
 }

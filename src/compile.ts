@@ -5,6 +5,7 @@ const formatter = require('html-formatter');
 
 import { parse } from './parse';
 import { Config, Result, RegExpBuilder as re } from './common';
+import defaultStyles from './wiki.css';
 
 const r = String.raw;
 
@@ -17,38 +18,37 @@ export function compile(dir: string = '.', config: Config = {}): void {
     // Write wikitext files
     const files = glob.sync((dir || '.') + "/**/*.wiki", {});
     files.forEach((file: string) => {
-        let data: string = fs.readFileSync(file, { encoding: 'utf8' });
-        let content: Result = parse(data, config);
+        const data: string = fs.readFileSync(file, { encoding: 'utf8' });
+        const content: Result = parse(data, config);
         let outText: string = content.toString();
+
         const templatesFolder = config.templatesFolder || 'templates';
         const imagesFolder = config.imagesFolder || 'images';
+        const outputFolder = config.outputFolder || 'wikity-out';
 
-        let [, folder, filename]: string[] = file.match(re(r`^(.+?[\/\\]) ((?:(?:${templatesFolder}|${imagesFolder})[\/\\])?[^\/\\]+)$`, '')) || [];
-        let outFolder: string = (dir || folder || '.') + '/' + (config.outputFolder || 'wikity-out') + '/';
-        let outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
-        let url: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase())
-        let displayTitle: string = content.metadata.displayTitle || url.replace('.html', '');
+        const [, folder, filename]: string[] = file.match(re(r`^(.+?[\/\\]) ((?:(?:${templatesFolder}|${imagesFolder})[\/\\])?[^\/\\]+)$`, '')) || [];
+        const outFolder: string = (dir || folder || '.') + '/' + outputFolder + '/';
+        const outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
+        const urlPath: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase())
+        const displayTitle: string = content.metadata.displayTitle || urlPath.replace('.html', '');
 
         // Eleventy configuration
-        let frontMatter: string = '';
-        if (config.eleventy) {
-            frontMatter = dedent`
+        const frontMatter = config.eleventy ? dedent`
                 ---
-                permalink: /wiki/${url}
+                permalink: /wiki/${urlPath}
                 ---
-            `;
-        }
+            ` : '';
 
-        // Create HTML
-        let toc: string = '';
+        // Create TOC
         if (!content.metadata.notoc && (content.metadata.toc || (outText.match(/<h\d[^>]*>/g)?.length || 0) > 3)) {
+            let toc = '';
             let headings = Array.from(content.match(/<h\d[^>]*>.+?<\/h\d>/gs) || []);
             headings.forEach(match => {
                 const text: string = match.replace(/\s*<\/?h\d[^>]*>\s*/g, '');
                 const lvl: number = +(match.match(/\d/g)?.[0] || -1);
                 toc += `${`<ol>`.repeat(lvl - 1)} <li> <a href="#${encodeURI(text.replace(/ /g, '_'))}">${text}</a> </li> ${`</ol>`.repeat(lvl - 1)}`;
             });
-            toc = dedent`
+            const tocElem = dedent`
                 <div id="toc">
                     <span id="toc-heading">
                         <strong>Contents</strong>
@@ -60,16 +60,18 @@ export function compile(dir: string = '.', config: Config = {}): void {
                     <ol>${toc}</ol>
                 </div>
             `;
-            if (outText.includes('<toc></toc>')) outText = outText.replace('<toc></toc>', toc);
-            else outText = outText.replace(/<h\d[^>]*>/, toc + '$&');
+            // Set TOC on page
+            if (outText.includes('<toc></toc>')) outText = outText.replace('<toc></toc>', tocElem);
+            else outText = outText.replace(/<h\d[^>]*>/, tocElem + '$&');
         }
 
-        let html = dedent`
+        // Create HTML
+        const html = dedent`
             <html>
                 <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="initial-scale=1.0, width=device-width">
-                    <meta name="description" content="${data.substr(0, 256)}">
+                    <meta name="description" content="${data.substring(0, 256)}">
                     <title>${displayTitle}</title>
                     <link id="default-styles" rel="stylesheet" href="/wiki.css">
                 </head>
@@ -89,18 +91,28 @@ export function compile(dir: string = '.', config: Config = {}): void {
         `;
 
         // Write to file
-        ['', templatesFolder, imagesFolder].forEach((path: string) => {
-            if (!fs.existsSync(outFolder + path)) fs.mkdirSync(outFolder + path);
-        });
-        let renderedHtml = formatter.render(html).replace(/(<\/\w+>)(\S)/g, '$1 $2');
+        for (const path of ['', templatesFolder, imagesFolder]) {
+            if (!fs.existsSync(outFolder + path)) {
+                fs.mkdirSync(outFolder + path);
+            }
+        };
+        const renderedHtml = formatter.render(html).replace(/(<\/\w+>)(\S)/g, '$1 $2');
         fs.writeFileSync(outFolder + outFilename, frontMatter + '\n' + renderedHtml, 'utf8');
 
         // Move images
         glob(imagesFolder + '/*', {}, (err: Error, files: string[]) => {
-            if (err) console.warn(err);
+            if (err) {
+                console.warn(err);
+            }
+
             const outImagesFolder = outFolder + imagesFolder + '/';
-            if (!fs.existsSync(outImagesFolder)) fs.mkdirSync(outImagesFolder);
-            files.forEach((file: string) => fs.copyFileSync(file, outImagesFolder + file.split(/[/\\]/).pop()));
+            if (!fs.existsSync(outImagesFolder)) {
+                fs.mkdirSync(outImagesFolder);
+            }
+
+            for (const file of files) {
+                fs.copyFileSync(file, outImagesFolder + file.split(/[/\\]/).pop())
+            };
         });
 
         // Create site styles
@@ -108,38 +120,12 @@ export function compile(dir: string = '.', config: Config = {}): void {
             stylesCreated = true;
             let styles: string = '';
             if (config.defaultStyles !== false) {
-                styles = dedent`
-                    body {font-family: sans-serif; margin: 4em; max-width: 1000px; background: #eee;}
-                    main {margin: 3em -1em; background: #fff; padding: 1em;}
-                    h1, h2 {margin-bottom: 0.6em; font-weight: normal; border-bottom: 1px solid #a2a9b1;}
-                    ul, ol {margin: 0.3em 0 0 1.6em; padding: 0;}
-                    dt {font-weight: bold;}
-                    dd, dl dl {margin-block: 0; margin-inline-start: 30px;}
-
-                    figure {margin: 1em;}
-                    .image-thumb, .image-frame {padding: 6px; border: 1px solid gray;}
-                    figcaption {padding-top: 6px;}
-
-                    table.wikitable {border-collapse: collapse;}
-                    table.wikitable, table.wikitable th, table.wikitable td {border: 1px solid gray; padding: 6px;}
-                    table.wikitable th {background-color: #eaecf0; text-align: center;}
-
-                    a:not(:hover) {text-decoration: none;}
-                    a.internal-link {color: #04a;}
-                    a.internal-link:visited {color: #26d;}
-                    a.external-link {color: #36b;}
-                    a.external-link:visited {color: #58d;}
-                    a.external-link::after {content: '\1f855';}
-                    a.redlink {color: #d33;}
-                    a.redlink:visited {color: #b44;}
-
-                    #toc {display: inline-block; border: 1px solid #aab; padding: 8px; background-color: #f8f8f8; font-size: 95%;}
-                    #toc-heading {display: block; text-align: center;}
-                    #toc ol {margin: 0 0 0 1.3em;}
-                `;
+                styles += defaultStyles;
             }
-            if (config.customStyles) styles += config.customStyles;
-            let cssOutput = dedent`
+            if (config.customStyles) {
+                styles += config.customStyles;
+            }
+            const cssOutput = dedent`
                 ---
                 permalink: /wiki.css
                 ---

@@ -23,6 +23,7 @@ Wikity is available [on npm](https://www.npmjs.com/package/wikity).
 - `wikity.compile(folder?: string, options?: object): void`
   - Compile all Wikitext (`.wiki`) files from an input folder (defaults to the current directory, `.`) into HTML.
 - `wikity.eleventyPlugin(folder?: string, options?: object): void`
+  *(deprecated)*
   - An implementation of `compile()` for use with Eleventy's `addPlugin` API. Identical to `compile()` except that option `eleventy` is `true` by default.
 - `wikity.parse(input: string, options?: object): string`
   - Parse raw wikitext input into HTML. Only option available is `templatesFolder`.
@@ -34,12 +35,14 @@ Wikity is available [on npm](https://www.npmjs.com/package/wikity).
     - What folder to place templates in (default: `'templates'`).
   - `imagesFolder?: string`
     - What folder to place images in (default: `'images'`). Make sure to pass through this folder to your build output if applicable.
-- `eleventy?: boolean`
+  - `eleventy?: boolean`
     - Whether [front matter](https://www.11ty.dev/docs/data-frontmatter/) will be added to the outputted HTML for Eleventy to read (default: `false`).
   - `defaultStyles?: boolean`
     - Whether to use default wiki styling (default: `true`).
   - `customStyles?: string`
     - Custom CSS to style the wiki pages (default: `''`).
+
+#### Example
 
 ```js
 const wikity = require('wikity');
@@ -62,7 +65,7 @@ module.exports = function (eleventyConfig) {
     const wikiFolder = 'src';
     const templatesFolder = 'templates', imagesFolder = 'images', outputFolder = 'wikity-out'; // defaults
     const wikityOptions = { templatesFolder, imagesFolder, outputFolder };
-    const wikityPlugin = () => wikity.eleventyPlugin(wikiFolder, wikityOptions);
+    const wikityPlugin = () => wikity.compile(wikiFolder, { eleventy: true, ...wikityOptions });
     eleventyConfig.addPlugin(wikityPlugin);
     eleventyConfig.addPassthroughCopy({[imagesFolder]: 'wiki/' + imagesFolder}); // Eleventy does not pass through images by default
 }

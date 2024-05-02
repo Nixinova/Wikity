@@ -16,16 +16,17 @@ export function parse(data: string, config: Config = {}): Result {
 
     const vars: Metadata = {};
     const metadata: Metadata = {};
-    let nowikis: string[] = [];
+    const nowikis: string[] = [];
+    const refs: string[] = [];
     let nowikiCount: number = 0;
     let rawExtLinkCount: number = 0;
     let refCount: number = 0;
-    let refs: string[] = [];
 
     let outText: string = data
 
     for (let l = 0, last = ''; l < MAX_RECURSION; l++) {
-        if (last === outText) break; last = outText;
+        if (last === outText) break;
+        last = outText;
 
         outText = outText
 
@@ -94,7 +95,8 @@ export function parse(data: string, config: Config = {}): Result {
                         // make sure the characters are not inside a string
                         let parsedMatch = args[0].replace(/".+?"/g, '').replace(/'.+?'/g, '');
                         if (/[abcefgijkqruvx]/i.test(parsedMatch)) {
-                            console.warn(`<Wikity> [WARN] Wikity does not use Wikipedia's #time function syntax. Use repetition-based formatting instead.`);
+                            const errMsg = `Wikity does not use Wikipedia's #time function syntax. Use repetition-based formatting (e.g. yyyy-mm-dd) instead.`;
+                            console.warn(`<Wikity> [WARN] ${errMsg}`);
                         }
                         return dateFormat(args[1] ? new Date(args[1]) : new Date(), args[0]);
                 }
@@ -102,15 +104,19 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Templates: {{template}}
             .replace(re(r`{{ \s* ([^#}|]+?) (\|[^}]+)? }} (?!})`), (_, title, params = '') => {
-                if (/{{/.test(params)) return _;
+                // Exit if contains nested template arguments
+                if (/{{/.test(params))
+                    return _;
+
                 const page: string = (config.templatesFolder || 'templates') + '/' + title.trim().replace(/ /g, '_');
 
-                // Retrieve template content
+                // Try retrieve template content
                 let content: string = '';
                 try {
                     content = fs.readFileSync('./' + page + '.wiki', { encoding: 'utf8' })
                 }
                 catch {
+                    // Return redlink if template doesn't exist
                     return `<a class="internal-link redlink" title="${title}" href="${page}">${title}</a>`;
                 }
 
@@ -121,10 +127,12 @@ export function parse(data: string, config: Config = {}): Result {
 
                 // Substitite arguments
                 const argMatch = (arg: string): RegExp => re(r`{{{ \s* ${arg} (?:\|([^}]*))? \s* }}}`);
-                let args: string[] = params.split('|').slice(1);
+                const args: string[] = params.split('|').slice(1);
                 for (let i in args) {
-                    let parts = args[i].split('=');
-                    let [arg, val]: string[] = parts[1] ? [parts[0], ...parts.slice(1)] : [(+i + 1) + '', parts[0]];
+                    const parts = args[i].split('=');
+                    const [arg, val] = parts[1]
+                        ? [parts[0], ...parts.slice(1)]
+                        : [(+i + 1).toString(), parts[0]];
                     content = content.replace(argMatch(arg), (_, m) => val || m || '');
                 }
                 for (let i = 1; i <= 10; i++) {
@@ -150,13 +158,21 @@ export function parse(data: string, config: Config = {}): Result {
                     }
                     else if (['border', 'frameless', 'frame', 'framed', 'thumb', 'thumbnail'].includes(param)) {
                         imageData.type = { framed: 'frame', thumbnail: 'thumb' }[param] || param;
-                        if (imageData.type === 'thumb') imageData.hasCaption = true;
+                        if (imageData.type === 'thumb') {
+                            imageData.hasCaption = true;
+                        }
                     }
                     else if (param.endsWith('px')) {
                         param.replace(/(?:(\w+)?(x))?(\w+)px/, (_, size1, auto, size2) => {
-                            if (size1) Object.assign(imageData, { width: size1, height: size2 });
-                            else if (auto) Object.assign(imageData, { width: 'auto', height: size2 });
-                            else Object.assign(imageData, { width: size2, height: 'auto' });
+                            if (size1) {
+                                Object.assign(imageData, { width: size1, height: size2 });
+                            }
+                            else if (auto) {
+                                Object.assign(imageData, { width: 'auto', height: size2 });
+                            }
+                            else {
+                                Object.assign(imageData, { width: size2, height: 'auto' });
+                            }
                             return '';
                         });
                     }
@@ -181,8 +197,16 @@ export function parse(data: string, config: Config = {}): Result {
                 }
                 let content = `
                     <figure
-                        class="${imageData.class || ''} image-container image-${imageData.type || 'default'}"
-                        style="float:${imageData.float || 'none'};vertical-align:${imageData.align || 'unset'};${imageData.style || ''}"
+                        class="
+                            ${imageData.class || ''}
+                            image-container
+                            image-${imageData.type || 'default'}
+                        "
+                        style="
+                            float: ${imageData.float || 'none'};
+                            vertical-align: ${imageData.align || 'unset'};
+                            ${imageData.style || ''}
+                        "
                     >
                         <img
                             src="${path}"
@@ -193,7 +217,9 @@ export function parse(data: string, config: Config = {}): Result {
                         ${imageData.hasCaption ? `<figcaption>${caption}</figcaption>` : ''}
                     </figure>
                 `;
-                if (imageData.link) content = `<a href="/${imageData.link}" title="${imageData.link}">${content}</a>`
+                if (imageData.link) {
+                    content = `<a href="/${imageData.link}" title="${imageData.link}">${content}</a>`;
+                }
                 return content;
             })
 
