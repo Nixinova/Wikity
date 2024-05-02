@@ -6,6 +6,8 @@
 
 **Wikity** is a tool that allows you to use Wikitext (used by Wikipedia, Fandom, etc) as a templating language to create HTML pages, useful in build tools such as [Eleventy](https://11ty.dev).
 
+**Currently works only with Eleventy <1.0.0**
+
 ## Install
 
 Wikity is available [on npm](https://www.npmjs.com/package/wikity).
@@ -49,19 +51,34 @@ wikity.compile();
 let html = wikity.parse(`'''bold''' [[link|text]]`); // <b>bold</b> <a href="link"...>text</a>
 ```
 
-Use Wikity along with Eleventy to compile your wiki files during the build process:
+#### As an Eleventy plugin
+
+Use Wikity along with Eleventy to have all your wiki files compiled during the build process:
 
 ```js
 // .eleventy.js (eleventy's configuration file)
 const wikity = require('wikity');
 module.exports = function (eleventyConfig) {
-    const wikiFolder = '.'; // current directory
-    const wikityOptions = {templatesFolder: 'templates', imagesFolder: 'images'}; // set as needed
+    const wikiFolder = 'src';
+    const templatesFolder = 'templates', imagesFolder = 'images', outputFolder = 'wikity-out'; // defaults
+    const wikityOptions = { templatesFolder, imagesFolder, outputFolder };
     const wikityPlugin = () => wikity.eleventyPlugin(wikiFolder, wikityOptions);
     eleventyConfig.addPlugin(wikityPlugin);
     eleventyConfig.addPassthroughCopy({[imagesFolder]: 'wiki/' + imagesFolder}); // Eleventy does not pass through images by default
 }
 ```
+
+The above will use the following file structure (with some example wiki files given):
+
+- `src/`
+  - `templates/`: Directory for wiki templates (called like `{{this}}`)
+  - `images/`: Directory to place images (called like `[[File:this]]`)
+  - `wikity-out/`: File templates compiled from the `.wiki` files (add this to `.gitignore`)
+  - `Index.wiki`: Example file
+  - `Other_Page.wiki`: Example other file
+- `wiki/`: Output HTML files compiled from wikity-out (add this to `.gitignore`)
+
+(View the above starting at the URL path `/wiki/` when ran in an HTTP server.)
 
 ### Command-line
 ```cmd
@@ -81,6 +98,7 @@ Use [Wikitext](https://en.wikipedia.org/wiki/Help:Wikitext) (file extension `.wi
 
 Any wiki templates (called using `{{template name}}`) must be inside the `templates/` folder by default.
 Any files must be inside the `images/` folder by default.
+Your wikitext (`*.wiki`) files go in the root directory by default.
 
 ### Wiki markup
 
