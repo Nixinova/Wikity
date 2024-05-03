@@ -1,6 +1,6 @@
 {
   "name": "wikity",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Compile wikitext to HTML: wikitext as a templating language.",
   "main": "dist/index.js",
   "scripts": {
@@ -17,13 +17,15 @@
     "dist/"
   ],
   "keywords": [
-    "eleventy",
-    "eleventy-plugin",
+    "compiler",
+    "compilation",
     "wikitext",
     "mediawiki",
     "html",
     "template-language",
-    "templating-language"
+    "templating-language",
+    "eleventy",
+    "eleventy-plugin"
   ],
   "repository": {
     "type": "git",
@@ -36,10 +38,10 @@
   "homepage": "https://github.com/Nixinova/Wikity#readme",
   "license": "ISC",
   "dependencies": {
-    "dateformat": "^4.5.1",
+    "dateformat": "^4.6.3",
     "dedent": "^0.7.0",
     "escape-html": "^1.0.3",
-    "glob": "^7.1.7",
+    "glob": "^7.2.3",
     "html-formatter": "^0.1.9"
   },
   "peerDependencies": {
@@ -51,7 +53,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "ts4.2",
-    "typescript": "~4.2.4"
+    "@types/node": "ts5.0",
+    "typescript": "~5.0.4 <5.1"
   }
 }

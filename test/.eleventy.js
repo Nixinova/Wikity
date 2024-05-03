@@ -1,4 +1,4 @@
-const wikity = require('../src/index.js')
+const wikity = require('../dist/index.js')
 
 module.exports = function (eleventyConfig) {
     eleventyConfig.addPassthroughCopy({ 'images/': 'wiki/images' });

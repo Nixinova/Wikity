@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.3.1
+*2024-05-03*
 - Allowed support for Eleventy >1.0.0.
 - Fixed crash occurring when compiling images with no parameters.
 - Fixed default template arguments not being parsed.
