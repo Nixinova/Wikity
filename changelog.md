@@ -3,7 +3,6 @@
 ## Next
 - Allowed support for Eleventy >1.0.0.
 - Fixed crash occurring when compiling images with no parameters.
-- Fixed images in output of `parse()` having relative URL paths.
 - Fixed default template arguments not being parsed.
 - Fixed output description metadata property being malformed.
 

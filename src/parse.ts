@@ -110,7 +110,7 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Templates: {{template}}
             .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
-                const page: string = '/' + templatesFolder + '/' + title.trim().replace(/ /g, '_');
+                const page: string = templatesFolder + '/' + title.trim().replace(/ /g, '_');
 
                 let content = '';
                 // Try retrieve template content
@@ -150,7 +150,7 @@ export function parse(data: string, config: Config = {}): Result {
             // Images: [[File:Image.png|options|caption]]
             .replace(re(r`\[\[ (?:File|Image): (.+?) (\|.+?)? \]\]`), (_, file, params = '') => {
                 if (/{{/.test(params)) return _;
-                const path: string = '/' + imagesFolder + '/' + file.trim().replace(/ /g, '_');
+                const path: string = imagesFolder + '/' + file.trim().replace(/ /g, '_');
                 let caption: string = '';
                 let imageData: { [key: string]: any } = {};
                 let imageArgs: string[] = params.split('|').map((arg: string) => arg.replace(/"/g, '&quot;'));
