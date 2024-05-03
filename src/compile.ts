@@ -18,9 +18,10 @@ export function compile(dir: string = '.', config: Config = {}): void {
     // Write wikitext files
     const files = glob.sync((dir || '.') + "/**/*.wiki", {});
     files.forEach((file: string) => {
-        const data: string = fs.readFileSync(file, { encoding: 'utf8' });
-        const content: Result = parse(data, config);
-        let outText: string = content.toString();
+        const fileData: string = fs.readFileSync(file, { encoding: 'utf8' });
+        const { data: content, metadata }: Result = parse(fileData, config);
+
+        let outText: string = content;
 
         const templatesFolder = config.templatesFolder || 'templates';
         const imagesFolder = config.imagesFolder || 'images';
@@ -30,7 +31,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         const outFolder: string = (dir || folder || '.') + '/' + outputFolder + '/';
         const outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
         const urlPath: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase())
-        const displayTitle: string = content.metadata.displayTitle || urlPath.replace('.html', '');
+        const displayTitle: string = metadata.displayTitle || urlPath.replace('.html', '');
 
         // Eleventy configuration
         const frontMatter = config.eleventy ? dedent`
@@ -40,7 +41,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
             ` : '';
 
         // Create TOC
-        if (!content.metadata.notoc && (content.metadata.toc || (outText.match(/<h\d[^>]*>/g)?.length || 0) > 3)) {
+        if (!metadata.notoc && (metadata.toc || (outText.match(/<h\d[^>]*>/g)?.length || 0) > 3)) {
             let toc = '';
             let headings = Array.from(content.match(/<h\d[^>]*>.+?<\/h\d>/gs) || []);
             headings.forEach(match => {
@@ -71,7 +72,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="initial-scale=1.0, width=device-width">
-                    <meta name="description" content="${data.substring(0, 256)}">
+                    <meta name="description" content="${fileData.substring(0, 256)}">
                     <title>${displayTitle}</title>
                     <link id="default-styles" rel="stylesheet" href="/wiki.css">
                 </head>

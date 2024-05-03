@@ -7,7 +7,6 @@
 **Wikity** is a tool that allows you to use Wikitext (used by Wikipedia, Fandom, etc) as a templating language to create HTML pages.
 
 This package comes with built-in support for compilation using [Eleventy](https://11ty.dev).
-(Currently only works with version **<1.0.0**.)
 
 ## Install
 
@@ -24,25 +23,31 @@ Install locally to use in a Node package or install globally for use from the co
 
 - `wikity.compile(folder?: string, options?: object): void`
   - Compile all Wikitext (`.wiki`) files from an input folder (defaults to the current directory, `.`) into HTML.
-    (See below for available options.)
 - `wikity.parse(input: string, options?: object): string`
-  - Parse raw wikitext input into HTML. Only option available is `templatesFolder` (see description below).
+  - Parse raw wikitext input into HTML.
 
 - **Options**:
   - `eleventy: boolean = false`
     - Whether [front matter](https://www.11ty.dev/docs/data-frontmatter/) will be added to the outputted HTML for Eleventy to read (default: `false`).
       (**This parameter *must* be set to `true` if you want to use this with Eleventy.**)
-  - `outputFolder: string = 'wikity-out'`
+  - `outputFolder: string`
+    - *Used only with `compile()`.*
     - Where outputted HTML files shall be placed.
-  - `templatesFolder: string = 'templates'`
+    - Default: `'wikity-out'`.
+  - `templatesFolder: string`
     - What folder to place templates in.
-  - `imagesFolder: string = 'images'`
+    - Default: `'templates'`.
+  - `imagesFolder: string`
     - What folder to place images in.
-      (Make sure to pass-through this folder to your build output if using Eleventy.)
-  - `defaultStyles: boolean = true`
+    - Default: `'images'`.
+  - `defaultStyles: boolean`
+    - *Used only with `compile()`.*
     - Whether to use default wiki styling.
-  - `customStyles: string = ''`
+    - Default: to `true` when called from `compile()` and `false` when called from `parse()`.
+  - `customStyles: string`
+    - *Used only with `compile()`.*
     - Custom CSS styles to add to the wiki pages.
+    - Default: empty (`''`).
 
 #### Example
 

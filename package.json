@@ -40,7 +40,7 @@
     "html-formatter": "^0.1.9"
   },
   "peerDependencies": {
-    "@11ty/eleventy": ">=0.10.0 <1"
+    "@11ty/eleventy": ">=0.10.0"
   },
   "peerDependenciesMeta": {
     "@11ty/eleventy": {

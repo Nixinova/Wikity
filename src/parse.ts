@@ -3,16 +3,20 @@ const htmlEscape = require('escape-html');
 const dateFormat = require('dateformat');
 
 import { Config, Result, Metadata, RegExpBuilder as re } from './common';
+import defaultStyles from './wiki.css';
 
 const r = String.raw;
 const MAX_RECURSION: number = 20;
 const arg: string = r`\s*([^|}]+?)\s*`;
 
 export function rawParse(data: string, config: Config = {}): string {
-    return parse(data, config).toString();
+    return parse(data, config).data;
 }
 
 export function parse(data: string, config: Config = {}): Result {
+
+    const templatesFolder = config.templatesFolder || 'templates';
+    const imagesFolder = config.imagesFolder || 'images';
 
     const vars: Metadata = {};
     const metadata: Metadata = {};
@@ -24,6 +28,7 @@ export function parse(data: string, config: Config = {}): Result {
 
     let outText: string = data
 
+    let stylesCreated = false;
     for (let l = 0, last = ''; l < MAX_RECURSION; l++) {
         if (last === outText) break;
         last = outText;
@@ -108,7 +113,7 @@ export function parse(data: string, config: Config = {}): Result {
                 if (/{{/.test(params))
                     return _;
 
-                const page: string = (config.templatesFolder || 'templates') + '/' + title.trim().replace(/ /g, '_');
+                const page: string = '/' + templatesFolder + '/' + title.trim().replace(/ /g, '_');
 
                 // Try retrieve template content
                 let content: string = '';
@@ -143,9 +148,9 @@ export function parse(data: string, config: Config = {}): Result {
             })
 
             // Images: [[File:Image.png|options|caption]]
-            .replace(re(r`\[\[ (?:File|Image): (.+?) (\|.+?)? \]\]`), (_, file, params) => {
+            .replace(re(r`\[\[ (?:File|Image): (.+?) (\|.+?)? \]\]`), (_, file, params = '') => {
                 if (/{{/.test(params)) return _;
-                const path: string = (config.imagesFolder || 'images') + '/' + file.trim().replace(/ /g, '_');
+                const path: string = '/' + imagesFolder + '/' + file.trim().replace(/ /g, '_');
                 let caption: string = '';
                 let imageData: { [key: string]: any } = {};
                 let imageArgs: string[] = params.split('|').map((arg: string) => arg.replace(/"/g, '&quot;'));
@@ -279,7 +284,7 @@ export function parse(data: string, config: Config = {}): Result {
             // Restore nowiki contents
             .replace(/%NOWIKI#(\d+)%/g, (_, n) => htmlEscape(nowikis[n]))
     }
-    let result: Result = new Result(outText);
-    result.metadata = metadata;
+
+    const result: Result = { data: outText, metadata: metadata };
     return result;
 }

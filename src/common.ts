@@ -1,6 +1,6 @@
 export type Metadata = Record<string, any>;
 
-export type Config = {
+export interface Config {
     /** The folder that Wikity's compiled HTML files are outputted to (defaults to 'wikity-out') */
     outputFolder?: string,
     /** The folder that wiki templates are to be stored in relative to the root folder */
@@ -15,12 +15,9 @@ export type Config = {
     customStyles?: string,
 }
 
-export class Result extends String {
-    public metadata: Metadata;
-    constructor(str: string) {
-        super(str);
-        this.metadata = {};
-    }
+export interface Result {
+    data: string;
+    metadata: Metadata;
 }
 
 export function RegExpBuilder(regex: string, flag: string = 'mgi') {
