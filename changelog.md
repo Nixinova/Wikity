@@ -5,6 +5,7 @@
 - Fixed crash occurring when compiling images with no parameters.
 - Fixed images in output of `parse()` having relative URL paths.
 - Fixed default template arguments not being parsed.
+- Fixed output description metadata property being malformed.
 
 ## 1.3.0
 *2021-05-16*

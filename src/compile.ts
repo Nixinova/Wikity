@@ -66,13 +66,16 @@ export function compile(dir: string = '.', config: Config = {}): void {
             else outText = outText.replace(/<h\d[^>]*>/, tocElem + '$&');
         }
 
+        // Create plaintext of HTML for use as description/metadata property.
+        const plaintextData = parsedContent.replace(/<.+?>/gs, ' ');
+
         // Create HTML
         const html = dedent`
             <html>
                 <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="initial-scale=1.0, width=device-width">
-                    <meta name="description" content="${parsedContent.substring(0, 256)}">
+                    <meta name="description" content="${plaintextData.substring(0, 256)}...">
                     <title>${displayTitle}</title>
                     <link id="default-styles" rel="stylesheet" href="/wiki.css">
                 </head>
