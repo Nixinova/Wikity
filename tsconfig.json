@@ -1,13 +1,19 @@
 {
+  "exclude": [
+    "dist/",
+    "build/"
+  ],
+
   "compilerOptions": {
     /* More info: https://aka.ms/tsconfig.json */
     /* Examples: https://github.com/tsconfig/bases */
 
     /* Basic Options */
-    //"incremental": true,
-    "target": "es2019",
+    "target": "es2019", // Node 12
     "module": "commonjs",
-    //"lib": [],
+    "lib": [
+      "es2020"
+    ],
     //"allowJs": true,
     //"checkJs": true,
     //"jsx": "preserve",
@@ -15,27 +21,25 @@
     //"declarationMap": true,
     //"sourceMap": true,
     //"outFile": "./",
-    //"outDir": "./",
+    "outDir": "./dist/",
     //"rootDir": "./",
     //"composite": true,
-    //"tsBuildInfoFile": "./",
     //"removeComments": true,
     //"noEmit": true,
     //"importHelpers": true,
     //"downlevelIteration": true,
     //"isolatedModules": true,
 
-    /* Strict Type-Checking Options */
+    /* Type-Checking */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    //"strictFunctionTypes": true,
+    "strictFunctionTypes": true,
     //"strictBindCallApply": true,
-    //"strictPropertyInitialization": true,
+    "strictPropertyInitialization": true,
     //"noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
     "alwaysStrict": true,
-
-    /* Additional Checks */
     //"noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
@@ -45,6 +49,7 @@
 
     /* Module Resolution Options */
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     //"baseUrl": "./",
     //"paths": {},
     //"rootDirs": [],
@@ -54,12 +59,6 @@
     "esModuleInterop": true,
     //"preserveSymlinks": true,
     //"allowUmdGlobalAccess": true,
-
-    /* Source Map Options */
-    //"sourceRoot": "",
-    //"mapRoot": "",
-    //"inlineSourceMap": true,
-    //"inlineSources": true,
 
     /* Advanced Options */
     "skipLibCheck": true,

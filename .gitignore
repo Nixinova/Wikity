@@ -1,6 +1,9 @@
-_site/
+# Dependencies
 node_modules/
+
+# Site output
+_site/
 wikity-out/
 
-src/*.js
-src/*.d.ts
+# Compiled source
+dist/

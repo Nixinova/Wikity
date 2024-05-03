@@ -2,16 +2,19 @@
   "name": "wikity",
   "version": "1.3.0",
   "description": "Compile wikitext to HTML: wikitext as a templating language.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "tsc && cd test && eleventy"
   },
   "bin": {
-    "wikity": "src/cli.js"
+    "wikity": "bin/index.js"
+  },
+  "engines": {
+    "node": ">=12"
   },
   "files": [
-    "src/*.js",
-    "src/*.d.ts"
+    "bin/",
+    "dist/"
   ],
   "keywords": [
     "eleventy",

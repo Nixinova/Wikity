@@ -1,6 +1,4 @@
-#!/usr/bin/env node
-
-const { VERSION } = require('../package.json');
+const VERSION = require('../package.json').version;
 
 import wikity from './index';
 
