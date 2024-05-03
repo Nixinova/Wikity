@@ -16,19 +16,19 @@ export function eleventyCompile(dir: string = '.', config: Config = {}): void {
 export function compile(dir: string = '.', config: Config = {}): void {
     let stylesCreated = false;
     // Write wikitext files
-    const files = glob.sync((dir || '.') + "/**/*.wiki", {});
+    const files = glob.sync(dir + "/**/*.wiki", {});
     files.forEach((file: string) => {
         const fileData: string = fs.readFileSync(file, { encoding: 'utf8' });
-        const { data: content, metadata }: Result = parse(fileData, config);
+        const { data: parsedContent, metadata }: Result = parse(fileData, config);
 
-        let outText: string = content;
+        let outText: string = parsedContent;
 
         const templatesFolder = config.templatesFolder || 'templates';
         const imagesFolder = config.imagesFolder || 'images';
         const outputFolder = config.outputFolder || 'wikity-out';
 
         const [, folder, filename]: string[] = file.match(re(r`^(.+?[\/\\]) ((?:(?:${templatesFolder}|${imagesFolder})[\/\\])?[^\/\\]+)$`, '')) || [];
-        const outFolder: string = (dir || folder || '.') + '/' + outputFolder + '/';
+        const outFolder: string = dir + '/' + outputFolder + '/';
         const outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
         const urlPath: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase())
         const displayTitle: string = metadata.displayTitle || urlPath.replace('.html', '');
@@ -43,7 +43,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         // Create TOC
         if (!metadata.notoc && (metadata.toc || (outText.match(/<h\d[^>]*>/g)?.length || 0) > 3)) {
             let toc = '';
-            let headings = Array.from(content.match(/<h\d[^>]*>.+?<\/h\d>/gs) || []);
+            let headings = Array.from(parsedContent.match(/<h\d[^>]*>.+?<\/h\d>/gs) || []);
             headings.forEach(match => {
                 const text: string = match.replace(/\s*<\/?h\d[^>]*>\s*/g, '');
                 const lvl: number = +(match.match(/\d/g)?.[0] || -1);
@@ -72,7 +72,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="initial-scale=1.0, width=device-width">
-                    <meta name="description" content="${fileData.substring(0, 256)}">
+                    <meta name="description" content="${parsedContent.substring(0, 256)}">
                     <title>${displayTitle}</title>
                     <link id="default-styles" rel="stylesheet" href="/wiki.css">
                 </head>

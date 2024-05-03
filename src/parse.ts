@@ -7,6 +7,7 @@ import defaultStyles from './wiki.css';
 
 const r = String.raw;
 const MAX_RECURSION: number = 20;
+const MAX_ARG_COUNT = 10;
 const arg: string = r`\s*([^|}]+?)\s*`;
 
 export function rawParse(data: string, config: Config = {}): string {
@@ -108,15 +109,11 @@ export function parse(data: string, config: Config = {}): Result {
             })
 
             // Templates: {{template}}
-            .replace(re(r`{{ \s* ([^#}|]+?) (\|[^}]+)? }} (?!})`), (_, title, params = '') => {
-                // Exit if contains nested template arguments
-                if (/{{/.test(params))
-                    return _;
-
+            .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
                 const page: string = '/' + templatesFolder + '/' + title.trim().replace(/ /g, '_');
 
+                let content = '';
                 // Try retrieve template content
-                let content: string = '';
                 try {
                     content = fs.readFileSync('./' + page + '.wiki', { encoding: 'utf8' })
                 }
@@ -130,21 +127,24 @@ export function parse(data: string, config: Config = {}): Result {
                     .replace(/<noinclude>.*?<\/noinclude>/gs, '')
                     .replace(/.*<(includeonly|onlyinclude)>|<\/(includeonly|onlyinclude)>.*/gs, '')
 
-                // Substitite arguments
+                // Substitute arguments
                 const argMatch = (arg: string): RegExp => re(r`{{{ \s* ${arg} (?:\|([^}]*))? \s* }}}`);
-                const args: string[] = params.split('|').slice(1);
-                for (let i in args) {
+                const args: string[] = params.split('|');
+                // provided key=value template arguments
+                for (let i = 1; i < args.length; i++) {
                     const parts = args[i].split('=');
                     const [arg, val] = parts[1]
                         ? [parts[0], ...parts.slice(1)]
-                        : [(+i + 1).toString(), parts[0]];
-                    content = content.replace(argMatch(arg), (_, m) => val || m || '');
-                }
-                for (let i = 1; i <= 10; i++) {
-                    content = content.replace(argMatch(arg), '$2');
+                        : [i.toString(), parts[0]];
+                    content = content.replace(argMatch(arg), (_, defaultVal) => val || defaultVal || '');
                 }
 
                 return content;
+            })
+
+            // Unparsed arguments
+            .replace(re(r`{{{ \s* [^{}|]+? (?:\|([^}]*))? \s* }}}`), (_, _name, defaultVal) => {
+                return defaultVal ?? '';
             })
 
             // Images: [[File:Image.png|options|caption]]
