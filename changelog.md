@@ -3,6 +3,7 @@
 ## Next
 - Fixed `nowiki` content not being fully unparsed.
 - Fixed output files not having the correct path to the default stylesheet.
+- Fixed URLs in output files being absolute.
 - Fixed various issues with incorrect outputted file names.
 - Fixed `||` not being treated as valid table cell syntax.
 - Fixed front matter being generated even when config option `eleventy` was set to `false`.

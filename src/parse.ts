@@ -19,9 +19,9 @@ export function rawParse(data: string, config: Config = {}): string {
 }
 
 export function parse(data: string, config: Config = {}): Result {
-
-    const templatesFolder = config.templatesFolder || 'templates';
-    const imagesFolder = config.imagesFolder || 'images';
+    const templatesFolder = config.templatesFolder ?? 'templates';
+    const imagesFolder = config.imagesFolder ?? 'images';
+    const outputFolder = config.outputFolder ?? 'wikity-out';
 
     const vars: Metadata = {};
     const metadata: Metadata = {};
@@ -114,7 +114,6 @@ export function parse(data: string, config: Config = {}): Result {
             // Templates: {{template}}
             .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
                 const page: string = paths.join(templatesFolder, title.trim().replace(/ /g, '_'));
-
                 let content = '';
                 // Try retrieve template content
                 try {
@@ -122,7 +121,8 @@ export function parse(data: string, config: Config = {}): Result {
                 }
                 catch {
                     // Return redlink if template doesn't exist
-                    return `<a class="internal-link redlink" title="${title}" href="${page}">${title}</a>`;
+                    const relPage = paths.basename(templatesFolder) + '/' + paths.relative(templatesFolder, page);
+                    return `<a class="internal-link redlink" title="${title}" href="${relPage}">${title}</a>`;
                 }
 
                 // Remove non-template sections
@@ -217,7 +217,7 @@ export function parse(data: string, config: Config = {}): Result {
                         "
                     >
                         <img
-                            src="${path}"
+                            src="${paths.basename(imagesFolder)}/${paths.relative(imagesFolder, path)}"
                             alt="${imageData.alt || file}"
                             width="${imageData.width || 300}"
                             height="${imageData.height || 300}"
