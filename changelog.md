@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Fixed characters around elements being erroneously padded with spaces.
 - Fixed equal signs in named template arguments creating broken output.
 - Fixed piped links in template arguments creating broken output.
 
