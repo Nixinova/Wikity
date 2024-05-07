@@ -107,7 +107,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         if (!fs.existsSync(paths.dirname(outFilePath))) {
             fs.mkdirSync(paths.dirname(outFilePath));
         }
-        const renderedHtml = formatter.render(html.replace(/(<\/\w+>) (\S)/g, '$1&#32;$2'));
+        const renderedHtml = formatter.render(html.replace(/(<\/\w+>) +(\S)/g, '$1&#32;$2'));
         fs.writeFileSync(outFilePath, frontMatter + '\n' + renderedHtml, 'utf8');
 
         // Move images

@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.3.3
+*2024-05-08*
 - Fixed characters around elements being erroneously padded with spaces.
 - Fixed inline definition lists not being parsed.
 - Fixed equal signs in named template arguments creating broken output.
