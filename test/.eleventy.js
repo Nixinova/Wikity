@@ -1,6 +1,8 @@
 const wikity = require('../dist/index.js')
 
 module.exports = function (eleventyConfig) {
-    eleventyConfig.addPassthroughCopy({ 'images/': 'wiki/images' });
-    eleventyConfig.addPlugin(() => wikity.eleventyPlugin());
+    const rootFolder = 'src';
+    const options = { eleventy: true };
+    eleventyConfig.addPlugin(() => wikity.compile(rootFolder, options));
+    eleventyConfig.addPassthroughCopy({ [`${rootFolder}/images/`]: 'wiki/images' });
 }
