@@ -47,15 +47,15 @@ else if (arg(1).includes('c')) {
     const argsList: string = configArgs.join(' ');
 
     // retrieve item from arguments list
-    const getArgContent = (arg: RegExp) => arg.test(argsList) && configArgs.filter((_, i) => arg.test(configArgs[i - 1])).join(' ') || '';
+    const getArgContent = (arg: RegExp) => arg.test(argsList) && configArgs.filter((_, i) => arg.test(configArgs[i - 1])).join(' ') || undefined;
 
     // Fetch user-supplied arguments
-    const folder: string = arg(2) || '.';
-    const outputFolder: string = getArgContent(/^-+o/);
-    const templatesFolder: string = getArgContent(/^-+t/);
-    const imagesFolder: string = getArgContent(/^-+i/);
-    const eleventy: boolean = /^-+e/.test(argsList);
-    const defaultStyles: boolean = /^-+d/.test(argsList);
+    const folder = arg(2) || '.';
+    const outputFolder = getArgContent(/^-+o/);
+    const templatesFolder = getArgContent(/^-+t/);
+    const imagesFolder = getArgContent(/^-+i/);
+    const eleventy = /^-+e/.test(argsList);
+    const defaultStyles = /^-+d/.test(argsList);
 
     wikity.compile(folder, { outputFolder, templatesFolder, imagesFolder, eleventy, defaultStyles });
 }

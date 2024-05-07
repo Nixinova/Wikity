@@ -6,6 +6,7 @@
 - Fixed various issues with incorrect outputted file names.
 - Fixed `||` not being treated as valid table cell syntax.
 - Fixed front matter being generated even when config option `eleventy` was set to `false`.
+- Fixed defaults not being used when `compile` called from CLI.
 
 ## 1.3.1
 *2024-05-03*
