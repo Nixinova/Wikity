@@ -70,6 +70,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         const plaintextData = parsedContent.replace(/<.+?>/gs, ' ');
 
         // Create HTML
+        const folderUpCount = file.split('/').length - dir.split('/').length;
         const html = dedent`
             <html>
                 <head>
@@ -77,7 +78,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                     <meta name="viewport" content="initial-scale=1.0, width=device-width">
                     <meta name="description" content="${plaintextData.substring(0, 256)}...">
                     <title>${displayTitle}</title>
-                    <link id="default-styles" rel="stylesheet" href="/wiki.css">
+                    <link id="default-styles" rel="stylesheet" href="${'../'.repeat(folderUpCount)}./wiki.css">
                 </head>
                 <body>
                     <header>

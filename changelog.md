@@ -1,5 +1,8 @@
 # Changelog
 
+## Next
+- Fixed output files not having the correct path to the default stylesheet.
+
 ## 1.3.1
 *2024-05-03*
 - Allowed support for Eleventy >1.0.0.
