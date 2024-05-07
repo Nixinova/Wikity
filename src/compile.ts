@@ -1,14 +1,12 @@
-const fs = require('fs');
-const paths = require('path');
-const glob = require('glob');
-const dedent = require('dedent');
-const formatter = require('html-formatter');
+import fs from 'fs';
+import paths from 'path';
+import glob from 'glob';
+import dedent from 'dedent';
+const formatter = require('html-formatter'); // does not have type package
 
 import { parse } from './parse';
-import { Config, Result, RegExpBuilder as re } from './common';
+import { Config, Result } from './common';
 import defaultStyles from './wiki.css';
-
-const r = String.raw;
 
 export function eleventyCompile(dir: string = '.', config: Config = {}): void {
     compile(dir, { eleventy: true, ...config });
@@ -113,7 +111,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         fs.writeFileSync(outFilePath, frontMatter + '\n' + renderedHtml, 'utf8');
 
         // Move images
-        glob(imagesFolder + '/*', {}, (err: Error, files: string[]) => {
+        glob(imagesFolder + '/*', {}, (err, files) => {
             if (err) {
                 console.warn(err);
             }
@@ -121,7 +119,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 fs.mkdirSync(outputImagesFolder);
             }
             for (const file of files) {
-                fs.copyFileSync(file, paths.join(outputImagesFolder, file.split(/[/\\]/).pop()))
+                fs.copyFileSync(file, paths.join(outputImagesFolder, paths.basename(file)))
             };
         });
 

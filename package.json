@@ -39,9 +39,9 @@
   "license": "ISC",
   "dependencies": {
     "dateformat": "^4.6.3",
-    "dedent": "^0.7.0",
+    "dedent": "^1.5.3",
     "escape-html": "^1.0.3",
-    "glob": "^7.2.3",
+    "glob": "^8.1.0",
     "html-formatter": "^0.1.9"
   },
   "peerDependencies": {
@@ -53,6 +53,10 @@
     }
   },
   "devDependencies": {
+    "@types/dateformat": "^3.0.1",
+    "@types/dedent": "^0.7.2",
+    "@types/escape-html": "^1.0.4",
+    "@types/glob": "^8.1.0",
     "@types/node": "ts5.0",
     "typescript": "~5.0.4 <5.1"
   }

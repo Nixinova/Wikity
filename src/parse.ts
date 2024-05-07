@@ -1,7 +1,7 @@
-const fs = require('fs');
-const paths = require('path');
-const htmlEscape = require('escape-html');
-const dateFormat = require('dateformat');
+import fs from 'fs';
+import paths from 'path';
+import htmlEscape from 'escape-html';
+import dateFormat from 'dateformat';
 
 import { Config, Result, Metadata, RegExpBuilder as re } from './common';
 
