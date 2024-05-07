@@ -133,13 +133,14 @@ export function compile(dir: string = '.', config: Config = {}): void {
             if (config.customStyles) {
                 styles += config.customStyles;
             }
-            const cssOutput = dedent`
+            const cssOutput = config.eleventy ? dedent`
                 ---
                 permalink: /wiki.css
                 ---
                 ${styles}
-            `;
-            fs.writeFileSync(paths.join(outputFolder, 'wiki.css.njk'), cssOutput);
+            ` : styles;
+            const cssOutFilename = config.eleventy ? 'wiki.css.njk' : 'wiki.css';
+            fs.writeFileSync(paths.join(outputFolder, cssOutFilename), cssOutput);
         }
 
     });
