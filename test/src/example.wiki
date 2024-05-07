@@ -68,7 +68,7 @@ __TOC__
 {{subst|Hello!}}
 {{subst|named=Named}}
 {{subst|named=
-This ''item'' is <span style="color:pink;">coloured</span>!
+This ''[[Item|item]]'' is <span style="color:pink;">coloured</span>!
 }}
 {{nonexistent template}}
 </div>

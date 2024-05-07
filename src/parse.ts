@@ -31,7 +31,9 @@ export function parse(data: string, config: Config = {}): Result {
     let rawExtLinkCount: number = 0;
     let refCount: number = 0;
 
-    let outText: string = data
+    let outText: string = data;
+
+    const escaper = (text: string, n: number) => `%${text}#${n}`;
 
     for (let l = 0, last = ''; l < MAX_RECURSION; l++) {
         if (last === outText) break;
@@ -40,7 +42,7 @@ export function parse(data: string, config: Config = {}): Result {
         outText = outText
 
             // Nowiki: <nowiki></nowiki>
-            .replace(re(r`<nowiki> ([^]+?) </nowiki>`), (_, m) => `%NOWIKI#${nowikis.push(m), nowikiCount++}%`)
+            .replace(re(r`<nowiki> ([^]+?) </nowiki>`), (_, m) => (nowikis.push(m), escaper('NOWIKI', nowikiCount++)))
 
             // Sanitise unacceptable HTML
             .replace(re(r`<(/?) \s* (?= script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea )`), '&lt;$1')
@@ -52,17 +54,25 @@ export function parse(data: string, config: Config = {}): Result {
             // Lines: ----
             .replace(/^-{4,}/gm, '<hr>')
 
+            // Internal links: [[Page]] and [[Page|Text]]
+            .replace(re(r`\[\[ ([^\]|]+?) \]\]`), `<a class{{=}}"internal-link" title{{=}}"$1" href{{=}}"$1">$1</a>`)
+            .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), `<a class{{=}}"internal-link" title{{=}}"$1" href{{=}}"/$1">$2</a>`)
+            .replace(re(r`(</a>)([a-z]+)`), '$2$1')
+
+            // External links: [href Page] and just [href]
+            .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => `<a class{{=}}"external-link" href{{=}}"${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`)
+
+            // Magic words: {{!}}, {{reflist}}, etc
+            .replace(re(r`{{ \s* ! \s* }}`), escaper('VERT', 0))
+            .replace(re(r`{{ \s* = \s* }}`), escaper('EQUALS', 0))
+            .replace(re(r`{{ \s* [Rr]eflist \s* }}`), '<references/>')
+
             // Metadata: displayTitle, __NOTOC__, etc
             .replace(re(r`{{ \s* displayTitle: ([^}]+) }}`), (_, title) => (metadata.displayTitle = title, ''))
             .replace(re(r`__NOINDEX__`), () => (metadata.noindex = true, ''))
             .replace(re(r`__NOTOC__`), () => (metadata.notoc = true, ''))
             .replace(re(r`__FORCETOC__`), () => (metadata.toc = true, ''))
             .replace(re(r`__TOC__`), () => (metadata.toc = true, `<toc></toc>`))
-
-            // Magic words: {{!}}, {{reflist}}, etc
-            .replace(re(r`{{ \s* ! \s* }}`), '&vert;')
-            .replace(re(r`{{ \s* = \s* }}`), '&equals;')
-            .replace(re(r`{{ \s* [Rr]eflist \s* }}`), '<references/>')
 
             // String functions: {{lc:}}, {{ucfirst:}}, {{len:}}, etc
             .replace(re(r`{{ \s* #? urlencode: ${arg} }}`), (_, m) => encodeURI(m))
@@ -137,7 +147,7 @@ export function parse(data: string, config: Config = {}): Result {
                 for (let i = 1; i < args.length; i++) {
                     const parts = args[i].split('=');
                     const [arg, val] = parts[1]
-                        ? [parts[0], ...parts.slice(1)]
+                        ? [parts[0], parts.slice(1).join('=')]
                         : [i.toString(), parts[0]];
                     content = content.replace(argMatch(arg), (_, defaultVal) => val || defaultVal || '');
                 }
@@ -238,14 +248,6 @@ export function parse(data: string, config: Config = {}): Result {
             // Headings: ==heading==
             .replace(re(r`^ (=+) \s* (.+?) \s* \1 \s* $`), (_, lvl, txt) => `<h${lvl.length} id="${encodeURI(txt.replace(/ /g, '_'))}">${txt}</h${lvl.length}>`)
 
-            // Internal links: [[Page]] and [[Page|Text]]
-            .replace(re(r`\[\[ ([^\]|]+?) \]\]`), `<a class="internal-link" title="$1" href="$1">$1</a>`)
-            .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), `<a class="internal-link" title="$1" href="/$1">$2</a>`)
-            .replace(re(r`(</a>)([a-z]+)`), '$2$1')
-
-            // External links: [href Page] and just [href]
-            .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => `<a class="external-link" href="${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`)
-
             // Bulleted list: *item
             .replace(re(r`^ (\*+) (.+?) $`), (_, lvl, txt) => `${'<ul>'.repeat(lvl.length)}<li>${txt}</li>${'</ul>'.repeat(lvl.length)}`)
             .replace(re(r`</ul> (\s*?) <ul>`), '$1')
@@ -286,10 +288,16 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(/(\r?\n){2}/g, '\n</p><p>\n')
 
     }
-    // Final changes (run only once)
+
+    // Restore nowiki contents
+    for (let i = 0; i < nowikis.length; i++) {
+        outText = outText
+            .replace(escaper('NOWIKI', i), (_, n) => fullyEscape(nowikis[n]))
+    }
+    // Substitute magic word functions
     outText = outText
-        // Restore nowiki contents
-        .replace(/%NOWIKI#(\d+)%/g, (_, n) => fullyEscape(nowikis[n]))
+        .replaceAll(escaper('VERT', 0), '|')
+        .replaceAll(escaper('EQUALS', 0), '=')
 
     const result: Result = { data: outText, metadata: metadata };
     return result;

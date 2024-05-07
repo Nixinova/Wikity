@@ -12,7 +12,7 @@
     "target": "es2019", // Node 12
     "module": "commonjs",
     "lib": [
-      "es2020"
+      "es2021"
     ],
     //"allowJs": true,
     //"checkJs": true,

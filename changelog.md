@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+- Fixed equal signs in named template arguments creating broken output.
+- Fixed piped links in template arguments creating broken output.
+
 ## 1.3.2
 *2024-05-08*
 - Fixed `nowiki` content not being fully unparsed.
