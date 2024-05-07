@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.3.2
+*2024-05-08*
 - Fixed `nowiki` content not being fully unparsed.
 - Fixed output files not having the correct path to the default stylesheet.
 - Fixed URLs in output files being absolute.
@@ -8,6 +9,7 @@
 - Fixed `||` not being treated as valid table cell syntax.
 - Fixed front matter being generated even when config option `eleventy` was set to `false`.
 - Fixed defaults not being used when `compile` called from CLI.
+- Unmarked Eleventy as a peer dependency.
 
 ## 1.3.1
 *2024-05-03*

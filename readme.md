@@ -69,12 +69,13 @@ Use Wikity along with Eleventy to have all your wiki files compiled during the b
 // .eleventy.js (eleventy's configuration file)
 const wikity = require('wikity');
 module.exports = function (eleventyConfig) {
-    const wikiFolder = 'src';
-    const templatesFolder = 'templates', imagesFolder = 'images', outputFolder = 'wikity-out'; // defaults
-    const wikityOptions = { templatesFolder, imagesFolder, outputFolder };
-    const wikityPlugin = () => wikity.compile(wikiFolder, { eleventy: true, ...wikityOptions });
+    const rootFolder = 'src';
+    const templatesFolder = 'templates', imagesFolder = 'images'; // defaults; relative to root folder
+    const outputFolder = 'wikity-out'; // default
+    const wikityOptions = { eleventy: true, templatesFolder, imagesFolder, outputFolder };
+    const wikityPlugin = () => wikity.compile(rootFolder, wikityOptions);
     eleventyConfig.addPlugin(wikityPlugin);
-    eleventyConfig.addPassthroughCopy({[imagesFolder]: 'wiki/' + imagesFolder}); // Eleventy does not pass through images by default
+    eleventyConfig.addPassthroughCopy({ 'src/images': 'wiki/' + imagesFolder }); // Eleventy does not pass through images by default
 }
 ```
 
@@ -83,10 +84,10 @@ The above will use the following file structure (with some example wiki files gi
 - `src/`
   - `templates/`: Directory for wiki templates (called like `{{this}}`)
   - `images/`: Directory to place images (called like `[[File:this]]`)
-  - `wikity-out/`: File templates compiled from the `.wiki` files (add this to `.gitignore`)
   - `Index.wiki`: Example file
   - `Other_Page.wiki`: Example other file
-- `wiki/`: Output HTML files compiled from wikity-out (add this to `.gitignore`)
+- `wikity-out/`: File templates compiled from the `.wiki` files (add this to `.gitignore`)
+- `wiki/`: Output HTML files compiled from `wikity-out/` (add this to `.gitignore`)
 
 (View the above starting at the URL path `/wiki/` when ran in an HTTP server.)
 

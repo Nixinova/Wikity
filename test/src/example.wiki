@@ -39,7 +39,7 @@ __TOC__
 </div>
 
 <div style="border:1px solid">
-<h1>Rule</h1>
+<h1>HorizontalRule</h1>
 -----
 </div>
 
