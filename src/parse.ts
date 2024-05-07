@@ -257,8 +257,9 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`</ol> (\s*?) <ol>`), '$1')
 
             // Definition list: ;head, :item
-            .replace(re(r`^ ; (.+) $`), '<dl><dt>$1</dt></dl>')
+            .replace(re(r`^ ; (.+?) : (.+?) $`), `<dl><dt>$1</td><dd>$2</dd></dl>`)
             .replace(re(r`^ (:+) (.+?) $`), (_, lvl, txt) => `${'<dl>'.repeat(lvl.length)}<dd>${txt}</dd>${'</dl>'.repeat(lvl.length)}`)
+            .replace(re(r`^ ; (.+) $`), '<dl><dt>$1</dt></dl>')
             .replace(re(r`</dl> (\s*?) <dl>`), '$1')
 
             // Tables: {|, |+, !, |-, |, |}

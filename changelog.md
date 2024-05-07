@@ -2,6 +2,7 @@
 
 ## Next
 - Fixed characters around elements being erroneously padded with spaces.
+- Fixed inline definition lists not being parsed.
 - Fixed equal signs in named template arguments creating broken output.
 - Fixed piped links in template arguments creating broken output.
 
