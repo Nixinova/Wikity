@@ -263,7 +263,8 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`^ \{\| (.*?) $`), (_, attrs) => `<table ${attrs}><tr>`)
             .replace(re(r`^ ! ([^]+?) (?= \n^[!|] )`), (_, content) => `<th>${content}</th>`)
             .replace(re(r`^ \|\+ (.*?) $`), (_, content) => `<caption>${content}</caption>`)
-            .replace(re(r`^ \|[^-+}] ([^]*?) (?= \n^[!|] )`), (_, content) => `<td>${content}</td>`)
+            .replace(re(r`^ \|[^-+}] ([^]*?) (?= \n | \|\| )`), (_, content) => `<td>${content}</td>`)
+            .replace(re(r`\|\|[^-+}] ([^]*?) (?= \n | \|\| )`), (_, content) => `<td>${content}</td>`)
             .replace(re(r`^ \|- (.*?) $`), (_, attrs) => `</tr><tr ${attrs}>`)
             .replace(re(r`^ \|\}`), `</tr></table>`)
 

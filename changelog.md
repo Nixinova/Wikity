@@ -4,6 +4,7 @@
 - Fixed `nowiki` content not being fully unparsed.
 - Fixed output files not having the correct path to the default stylesheet.
 - Fixed various issues with incorrect outputted file names.
+- Fixed `||` not being treated as valid table cell syntax.
 
 ## 1.3.1
 *2024-05-03*
