@@ -10,6 +10,11 @@ const MAX_RECURSION: number = 20;
 const MAX_ARG_COUNT = 10;
 const arg: string = r`\s*([^|}]+?)\s*`;
 
+function fullyEscape(text: string) {
+    return htmlEscape(text)
+        .replace(/{/g, '&#123;') // avoid keeping plain {{}} which is parsed as a template call
+}
+
 export function rawParse(data: string, config: Config = {}): string {
     return parse(data, config).data;
 }
@@ -29,7 +34,6 @@ export function parse(data: string, config: Config = {}): Result {
 
     let outText: string = data
 
-    let stylesCreated = false;
     for (let l = 0, last = ''; l < MAX_RECURSION; l++) {
         if (last === outText) break;
         last = outText;
@@ -281,9 +285,11 @@ export function parse(data: string, config: Config = {}): Result {
             // Spacing
             .replace(/(\r?\n){2}/g, '\n</p><p>\n')
 
-            // Restore nowiki contents
-            .replace(/%NOWIKI#(\d+)%/g, (_, n) => htmlEscape(nowikis[n]))
     }
+    // Final changes (run only once)
+    outText = outText
+        // Restore nowiki contents
+        .replace(/%NOWIKI#(\d+)%/g, (_, n) => fullyEscape(nowikis[n]))
 
     const result: Result = { data: outText, metadata: metadata };
     return result;

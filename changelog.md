@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Fixed `nowiki` content not being fully unparsed.
 - Fixed output files not having the correct path to the default stylesheet.
 
 ## 1.3.1
