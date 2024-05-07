@@ -1,5 +1,8 @@
 # Changelog
 
+## Next
+- Fixed images being erroneously parsed as regular links.
+
 ## 1.3.3
 *2024-05-08*
 - Fixed characters around elements being erroneously padded with spaces.
