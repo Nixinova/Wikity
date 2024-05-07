@@ -3,6 +3,7 @@
 ## Next
 - Fixed `nowiki` content not being fully unparsed.
 - Fixed output files not having the correct path to the default stylesheet.
+- Fixed various issues with incorrect outputted file names.
 
 ## 1.3.1
 *2024-05-03*

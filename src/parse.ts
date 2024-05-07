@@ -1,13 +1,12 @@
 const fs = require('fs');
+const paths = require('path');
 const htmlEscape = require('escape-html');
 const dateFormat = require('dateformat');
 
 import { Config, Result, Metadata, RegExpBuilder as re } from './common';
-import defaultStyles from './wiki.css';
 
 const r = String.raw;
 const MAX_RECURSION: number = 20;
-const MAX_ARG_COUNT = 10;
 const arg: string = r`\s*([^|}]+?)\s*`;
 
 function fullyEscape(text: string) {
@@ -114,12 +113,12 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Templates: {{template}}
             .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
-                const page: string = templatesFolder + '/' + title.trim().replace(/ /g, '_');
+                const page: string = paths.join(templatesFolder, title.trim().replace(/ /g, '_'));
 
                 let content = '';
                 // Try retrieve template content
                 try {
-                    content = fs.readFileSync('./' + page + '.wiki', { encoding: 'utf8' })
+                    content = fs.readFileSync(page + '.wiki', { encoding: 'utf8' })
                 }
                 catch {
                     // Return redlink if template doesn't exist
@@ -154,7 +153,7 @@ export function parse(data: string, config: Config = {}): Result {
             // Images: [[File:Image.png|options|caption]]
             .replace(re(r`\[\[ (?:File|Image): (.+?) (\|.+?)? \]\]`), (_, file, params = '') => {
                 if (/{{/.test(params)) return _;
-                const path: string = imagesFolder + '/' + file.trim().replace(/ /g, '_');
+                const path: string = paths.join(imagesFolder, file.trim().replace(/ /g, '_'));
                 let caption: string = '';
                 let imageData: { [key: string]: any } = {};
                 let imageArgs: string[] = params.split('|').map((arg: string) => arg.replace(/"/g, '&quot;'));

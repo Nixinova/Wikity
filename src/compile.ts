@@ -1,4 +1,5 @@
 const fs = require('fs');
+const paths = require('path');
 const glob = require('glob');
 const dedent = require('dedent');
 const formatter = require('html-formatter');
@@ -14,23 +15,32 @@ export function eleventyCompile(dir: string = '.', config: Config = {}): void {
 }
 
 export function compile(dir: string = '.', config: Config = {}): void {
+    // set defaults
+    config.templatesFolder ??= 'templates';
+    config.imagesFolder ??= 'images';
+    config.outputFolder ??= 'wikity-out';
+
+    // directory variables (absolute paths)
+    const baseDir = paths.resolve(dir);
+    const templatesFolder = paths.join(baseDir, config.templatesFolder);
+    const imagesFolder = paths.join(baseDir, config.imagesFolder);
+    const outputFolder = paths.join(baseDir, config.outputFolder);
+    const outputImagesFolder = paths.join(baseDir, config.outputFolder, config.imagesFolder);
+    const newConfig = { ...config, templatesFolder, imagesFolder, outputFolder };
+
     let stylesCreated = false;
     // Write wikitext files
     const files = glob.sync(dir + "/**/*.wiki", {});
     files.forEach((file: string) => {
         const fileData: string = fs.readFileSync(file, { encoding: 'utf8' });
-        const { data: parsedContent, metadata }: Result = parse(fileData, config);
+        const { data: parsedContent, metadata }: Result = parse(fileData, newConfig);
 
         let outText: string = parsedContent;
 
-        const templatesFolder = config.templatesFolder || 'templates';
-        const imagesFolder = config.imagesFolder || 'images';
-        const outputFolder = config.outputFolder || 'wikity-out';
-
-        const [, folder, filename]: string[] = file.match(re(r`^(.+?[\/\\]) ((?:(?:${templatesFolder}|${imagesFolder})[\/\\])?[^\/\\]+)$`, '')) || [];
-        const outFolder: string = dir + '/' + outputFolder + '/';
+        const filename = file.replace(dir, '').replace(/^[\/\\]/, '');
         const outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
-        const urlPath: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase())
+        const outFilePath = paths.join(outputFolder, outFilename);
+        const urlPath: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase()); // capitalise first letters
         const displayTitle: string = metadata.displayTitle || urlPath.replace('.html', '');
 
         // Eleventy configuration
@@ -70,7 +80,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         const plaintextData = parsedContent.replace(/<.+?>/gs, ' ');
 
         // Create HTML
-        const folderUpCount = file.split('/').length - dir.split('/').length;
+        const folderUpCount = file.split(/[\/\\]/).length - dir.split(/[\/\\]/).length; // number of folders to go up by to get to root
         const html = dedent`
             <html>
                 <head>
@@ -96,27 +106,22 @@ export function compile(dir: string = '.', config: Config = {}): void {
         `;
 
         // Write to file
-        for (const path of ['', templatesFolder, imagesFolder]) {
-            if (!fs.existsSync(outFolder + path)) {
-                fs.mkdirSync(outFolder + path);
-            }
-        };
+        if (!fs.existsSync(paths.dirname(outFilePath))) {
+            fs.mkdirSync(paths.dirname(outFilePath));
+        }
         const renderedHtml = formatter.render(html).replace(/(<\/\w+>)(\S)/g, '$1 $2');
-        fs.writeFileSync(outFolder + outFilename, frontMatter + '\n' + renderedHtml, 'utf8');
+        fs.writeFileSync(outFilePath, frontMatter + '\n' + renderedHtml, 'utf8');
 
         // Move images
         glob(imagesFolder + '/*', {}, (err: Error, files: string[]) => {
             if (err) {
                 console.warn(err);
             }
-
-            const outImagesFolder = outFolder + imagesFolder + '/';
-            if (!fs.existsSync(outImagesFolder)) {
-                fs.mkdirSync(outImagesFolder);
+            if (!fs.existsSync(outputImagesFolder)) {
+                fs.mkdirSync(outputImagesFolder);
             }
-
             for (const file of files) {
-                fs.copyFileSync(file, outImagesFolder + file.split(/[/\\]/).pop())
+                fs.copyFileSync(file, paths.join(outputImagesFolder, file.split(/[/\\]/).pop()))
             };
         });
 
@@ -136,7 +141,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 ---
                 ${styles}
             `;
-            fs.writeFileSync(outFolder + 'wiki.css.njk', cssOutput);
+            fs.writeFileSync(paths.join(outputFolder, 'wiki.css.njk'), cssOutput);
         }
 
     });
