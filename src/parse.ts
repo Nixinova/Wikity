@@ -115,6 +115,7 @@ export function parse(data: string, config: Config = {}): Result {
                             image-${imageData.type || 'default'}
                         "
                         style="
+                            display: inline-block;
                             float: ${imageData.float || 'none'};
                             vertical-align: ${imageData.align || 'unset'};
                             ${imageData.style || ''}
