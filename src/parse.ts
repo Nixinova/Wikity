@@ -72,8 +72,10 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(/^-{4,}/gm, '<hr>')
 
             // Images: [[File:Image.png|options|caption]]
-            .replace(re(r`\[\[ (?:File|Image): (.+?) (\|.+?)? \]\]`), (_, file, params = '') => {
-                if (/{{/.test(params)) return _;
+            .replace(re(r`\[\[ (?:File|Image): (.*?) (\|.+?)? \]\]`), (_, file, params = '') => {
+                if (params.includes('{{')) return _;
+                if (!file) return '';
+
                 const path: string = paths.join(imagesFolder, file.trim().replace(/ /g, '_'));
                 let caption: string = '';
                 let imageData: { [key: string]: any } = {};
@@ -147,9 +149,13 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Internal links: [[Page]] and [[Page|Text]]
             .replace(re(r`\[\[ ([^\]|]+?) \]\]`), (_, link) => {
+                if (link.includes('{{')) return _;
+
                 return `<a class{{=}}"internal-link" title{{=}}"${link}" href{{=}}"./${cleanLink(link)}">${link}</a>`;
             })
             .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), (_, link, text) => {
+                if (link.includes('{{')) return _;
+
                 return `<a class{{=}}"internal-link" title{{=}}"${link}" href{{=}}"./${cleanLink(link)}">${text}</a>`;
             })
             .replace(re(r`(</a>)([a-z]+)`), '$2$1')
@@ -217,7 +223,8 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Parser functions: {{#if:}}, {{#switch:}}, etc
             .replace(re(r`{{ \s* (#\w+) \s* : \s* ( [^{}]+ ) \s* }} ( ?!} )`), (_, name, content) => {
-                if (/{{\s*#/.test(content)) return _;
+                if (content.includes('{{')) return _;
+
                 const args: string[] = content.trim().split(/\s*\|\s*/);
                 switch (name) {
                     case '#if':

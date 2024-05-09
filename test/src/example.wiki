@@ -144,6 +144,14 @@ Each side of the <code>=</code> must match.
 Each side of the <code>&rarr;</code> must match.
 * {{#if: true | true text | false text }} &rarr; true text
 * {{#if: {{{variable|}}} | true text | false text }} &rarr; false text
+* {{#if: {{{image|}}}
+  | Image: <span>[[File:{{{image|}}}|48px|link={{{link|}}}]]</span>
+  | None
+}} = None
+* {{#if: {{{image|Example.png}}}
+  | Image: <span>[[File:{{{image|Example.png}}}|48px|link={{{link|}}}]]</span>
+  | None
+}} = [Example.png]
 * {{ #vardefine: test | value }} &rarr; (empty: variable defined)
 * [[{{ #var:test }}]] &rarr; [[value]]
 * "{{#var: unset | this {{=}} unset }}" &rarr; "this = unset"

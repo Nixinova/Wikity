@@ -4,6 +4,7 @@
 - Added support for video embeds: currently only supports `{{#ev:youtube}}` and `{{#ev:vimeo}}`.
 - Changed images to be displayed inline by default when no float is given.
 - Fixed unused parameters being substituted with random numbers instead of their default values.
+- Fixed files and links becoming broken when parameters are inside them.
 - Fixed images being erroneously parsed as regular links.
 - Fixed internal links.
 
