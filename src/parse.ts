@@ -19,7 +19,7 @@ function cleanLink(link: string) {
 }
 
 function parseDimensions(dimStr: string) {
-    const regex = /(\w*)x(\w*)px/;
+    const regex = /(\d*)(?:x(\d*))?px/;
     const match = dimStr.match(regex);
     if (!match) return { width: 'auto', height: 'auto' };
     const [, width, height] = match;

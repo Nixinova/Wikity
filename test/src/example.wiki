@@ -53,6 +53,8 @@ __TOC__
 <h1>FileEmbed</h1>
 [[File:Example.png]]
 [[File:Example.png|48px]]
+[[File:Example.png|48x50px]]
+[[File:Example.png|x10px]]
 [[File:Example.png|alt=Example]]
 [[File:Example.png|200px|thumb|right|alt=Alt text|Example text]]
 [[File:Example.png|100px|link=]]
