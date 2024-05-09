@@ -162,6 +162,7 @@ Your wikitext (`*.wiki`) files go in the root directory by default.
 | `{{#explode:A-B-C-D\|-\|2}}`     | C                                         |
 | `{{#urlencode:t e x t}}`         | t%20e%20x%20t                             |
 | `{{#urldecode:a%20b%27c}}`       | a b'c                                     |
+| `{{#ev:youtube\|dQw4w9WgXcQ}}`   | *(YouTube embed)*                         |
 | `<noinclude>No</noinclude>`      | *(blank outside a template)*              |
 | `<onlyinclude>Yes</onlyinclude>` | Yes                                       |
 | `<includeonly>Yes</includeonly>` | Yes *(blank inside a template)*           |

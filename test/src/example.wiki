@@ -132,6 +132,14 @@ Each side of the <code>=</code> must match.
 </div>
 
 <div style="border:1px solid">
+<h1>MagicFunctions</h1>
+{{#unknown:foo}}
+{{#ev:youtube|dQw4w9WgXcQ}}
+{{#ev:youtube|dQw4w9WgXcQ|100px|left|Important video.}}
+<div style="clear:both;"></div>
+</div>
+
+<div style="border:1px solid">
 <h1>ParserFunctions</h1>
 Each side of the <code>&rarr;</code> must match.
 * {{#if: true | true text | false text }} &rarr; true text

@@ -18,11 +18,24 @@ function cleanLink(link: string) {
     return encodeURI(link.replace(/ /g, '_'));
 }
 
+function parseDimensions(dimStr: string) {
+    const regex = /(\w*)x(\w*)px/;
+    const match = dimStr.match(regex);
+    if (!match) return { width: 'auto', height: 'auto' };
+    const [, width, height] = match;
+    return {
+        width: width || 'auto',
+        height: height || 'auto',
+    };
+}
+
 export function rawParse(data: string, config: Config = {}): string {
     return parse(data, config).data;
 }
 
 export function parse(data: string, config: Config = {}): Result {
+    const KEY = Math.random().toString().slice(2); // key used to allow certain disallowed HTML elements
+
     const templatesFolder = config.templatesFolder ?? 'templates';
     const imagesFolder = config.imagesFolder ?? 'images';
     const outputFolder = config.outputFolder ?? 'wikity-out';
@@ -37,7 +50,7 @@ export function parse(data: string, config: Config = {}): Result {
 
     let outText: string = data;
 
-    const escaper = (text: string, n: number) => `%${text}#${n}`;
+    const escaper = (text: string, n: number = 0) => `%${text}#${n}`;
 
     for (let l = 0, last = ''; l < MAX_RECURSION; l++) {
         if (last === outText) break;
@@ -49,7 +62,7 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`<nowiki> ([^]+?) </nowiki>`), (_, m) => (nowikis.push(m), escaper('NOWIKI', nowikiCount++)))
 
             // Sanitise unacceptable HTML
-            .replace(re(r`<(/?) \s* (?= script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea )`), '&lt;$1')
+            .replace(re(r`< \s* (?= (?: script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea ) (?! \s* key=.?${KEY}) )`), '&lt;$1')
             .replace(re(r`(?<= <[^>]+ ) (\bon(\w+))`), 'data-$2')
 
             // Comments: <!-- -->
@@ -79,18 +92,9 @@ export function parse(data: string, config: Config = {}): Result {
                         }
                     }
                     else if (param.endsWith('px')) {
-                        param.replace(/(?:(\w+)?(x))?(\w+)px/, (_, size1, auto, size2) => {
-                            if (size1) {
-                                Object.assign(imageData, { width: size1, height: size2 });
-                            }
-                            else if (auto) {
-                                Object.assign(imageData, { width: 'auto', height: size2 });
-                            }
-                            else {
-                                Object.assign(imageData, { width: size2, height: 'auto' });
-                            }
-                            return '';
-                        });
+                        const { width, height } = parseDimensions(param);
+                        imageData.width = width;
+                        imageData.height = height;
                     }
                     else if (param.startsWith('upright=')) {
                         imageData.width = +param.replace('upright=', '') * 300;
@@ -154,8 +158,8 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => `<a class{{=}}"external-link" href{{=}}"${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`)
 
             // Magic words: {{!}}, {{reflist}}, etc
-            .replace(re(r`{{ \s* ! \s* }}`), escaper('VERT', 0))
-            .replace(re(r`{{ \s* = \s* }}`), escaper('EQUALS', 0))
+            .replace(re(r`{{ \s* ! \s* }}`), escaper('VERT'))
+            .replace(re(r`{{ \s* = \s* }}`), escaper('EQUALS'))
             .replace(re(r`{{ \s* [Rr]eflist \s* }}`), '<references/>')
 
             // Metadata: displayTitle, __NOTOC__, etc
@@ -180,8 +184,39 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`{{ \s* #? replace: ${arg} \|${arg} \|${arg} }}`), (_, str, find, rep) => str.split(find).join(rep))
             .replace(re(r`{{ \s* #? explode: ${arg} \|${arg} \|${arg} }}`), (_, str, delim, pos) => str.split(delim)[+pos])
 
+            // Magic functions: {{#ev:youtube}}, etc
+            .replace(re(r`{{ \s* #? ev: \s* (\w+) \s* \| \s* ( [^{}]+ ) \s* }} ( ?!} )`), (_, platform: string, args: string) => {
+                // See mediawiki.org/wiki/Extension:EmbedVideo_(fork) for docs
+                const params = args.split('|');
+                for (let i = 0; i < 10; i++) params[i] ??= ''; // fill up with empty strings
+
+                const [id, dimensions, alignment, description, container, urlargs, autoresize] = params;
+                const { width, height } = parseDimensions(dimensions);
+                const source = {
+                    // Add platforms
+                    'youtube': `//www.youtube.com/embed/${id}`,
+                    'vimeo': `//player.vimeo.com/video/${id}`,
+                }[platform];
+                if (!source) return `<code>Failed to load video ${id} from ${platform}.</code>`;
+                const EQ = escaper('EQUALS');
+                return `
+                    <iframe key="${KEY}"
+                        src${EQ}"${source}"
+                        width${EQ}"${width}"
+                        height${EQ}"${height}"
+                        frameborder${EQ}"0"
+                        allowfullscreen${EQ}"true"
+                        loading${EQ}"lazy"
+                        title${EQ}"${description ?? 'Play video'}"
+                        ${alignment ? `style="float: ${alignment};"` : ''}
+                    >
+                    </iframe>
+                    ${description ? `<figcaption>${description}</figcaption>` : ''}
+                `;
+            })
+
             // Parser functions: {{#if:}}, {{#switch:}}, etc
-            .replace(re(r`{{ \s* (#\w+) \s* : \s* ( [^{}]+ ) \s* }}  ( ?!} )`), (_, name, content) => {
+            .replace(re(r`{{ \s* (#\w+) \s* : \s* ( [^{}]+ ) \s* }} ( ?!} )`), (_, name, content) => {
                 if (/{{\s*#/.test(content)) return _;
                 const args: string[] = content.trim().split(/\s*\|\s*/);
                 switch (name) {
@@ -307,8 +342,8 @@ export function parse(data: string, config: Config = {}): Result {
     }
     // Substitute magic word functions
     outText = outText
-        .replaceAll(escaper('VERT', 0), '|')
-        .replaceAll(escaper('EQUALS', 0), '=')
+        .replaceAll(escaper('VERT'), '|')
+        .replaceAll(escaper('EQUALS'), '=')
 
     const result: Result = { data: outText, metadata: metadata };
     return result;
