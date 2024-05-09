@@ -3,6 +3,7 @@
 ## Next
 - Changed images to be displayed inline by default when no float is given.
 - Fixed images being erroneously parsed as regular links.
+- Fixed internal links.
 
 ## 1.3.3
 *2024-05-08*

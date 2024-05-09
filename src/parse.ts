@@ -14,6 +14,10 @@ function fullyEscape(text: string) {
         .replace(/{/g, '&#123;') // avoid keeping plain {{}} which is parsed as a template call
 }
 
+function cleanLink(link: string) {
+    return encodeURI(link.replace(/ /g, '_'));
+}
+
 export function rawParse(data: string, config: Config = {}): string {
     return parse(data, config).data;
 }
@@ -130,15 +134,20 @@ export function parse(data: string, config: Config = {}): Result {
                         ${imageData.hasCaption ? `<figcaption>${caption}</figcaption>` : ''}
                     </figure>
                 `;
-                if (imageData.link) {
-                    content = `<a href="/${imageData.link}" title="${imageData.link}">${content}</a>`;
+                const imageLink = imageData.link;
+                if (imageLink) {
+                    content = `<a href="${cleanLink(imageLink)}" title="${imageLink}">${content}</a>`;
                 }
                 return content;
             })
 
             // Internal links: [[Page]] and [[Page|Text]]
-            .replace(re(r`\[\[ ([^\]|]+?) \]\]`), `<a class{{=}}"internal-link" title{{=}}"$1" href{{=}}"$1">$1</a>`)
-            .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), `<a class{{=}}"internal-link" title{{=}}"$1" href{{=}}"/$1">$2</a>`)
+            .replace(re(r`\[\[ ([^\]|]+?) \]\]`), (_, link) => {
+                return `<a class{{=}}"internal-link" title{{=}}"${link}" href{{=}}"./${cleanLink(link)}">${link}</a>`;
+            })
+            .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), (_, link, text) => {
+                return `<a class{{=}}"internal-link" title{{=}}"${link}" href{{=}}"./${cleanLink(link)}">${text}</a>`;
+            })
             .replace(re(r`(</a>)([a-z]+)`), '$2$1')
 
             // External links: [href Page] and just [href]
