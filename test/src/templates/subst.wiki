@@ -1,5 +1,1 @@
-'''Substituted text: {{{1|Null}}}!'''
-
-Unset: {{{__unset__}}}
-
-Named: {{{named}}}
+{ '''Substituted text: {{{1|Null}}}!'''; Unset: {{{__unset__}}}; Named: {{{named}}} }

@@ -51,8 +51,11 @@ __TOC__
 
 <div style="border:1px solid">
 <h1>FileEmbed</h1>
+[[File:Example.png]]
+[[File:Example.png|48px]]
 [[File:Example.png|alt=Example]]
 [[File:Example.png|200px|thumb|right|alt=Alt text|Example text]]
+[[File:Example.png|100px|link=]]
 </div>
 
 <div style="border:1px solid">
@@ -64,12 +67,12 @@ __TOC__
 
 <div style="border:1px solid">
 <h1>TemplateCall</h1>
-{{subst}}
-{{subst|Hello!}}
-{{subst|named=Named}}
-{{subst|named=
+* {{subst}} = '''Substituted text: Null!'''; Unset: (empty); Named: (empty)
+* {{subst|Hello!}} = '''Substituted text: Hello!!'''; Unset: (empty); Named: (empty)
+* {{subst|named=Named}} = '''Substituted text: Null!'''; Unset: (empty); Named: Named
+* {{subst|named=
 This [[object]] and this ''[[Item|item]]'' are not <span style="color:pink;">coloured</span>!
-}}
+}} = '''Substituted text: Null!'''; Unset: (empty); Named: This [[object]] and this ''[[Item|item]]'' are not <span style="color:pink;">coloured</span>!
 {{nonexistent template}}
 </div>
 
@@ -132,6 +135,7 @@ Each side of the <code>=</code> must match.
 <h1>ParserFunctions</h1>
 Each side of the <code>&rarr;</code> must match.
 * {{#if: true | true text | false text }} &rarr; true text
+* {{#if: {{{variable|}}} | true text | false text }} &rarr; false text
 * {{ #vardefine: test | value }} &rarr; (empty: variable defined)
 * [[{{ #var:test }}]] &rarr; [[value]]
 * "{{#var: unset | this {{=}} unset }}" &rarr; "this = unset"

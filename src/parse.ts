@@ -247,7 +247,7 @@ export function parse(data: string, config: Config = {}): Result {
             })
 
             // Unparsed arguments
-            .replace(re(r`{{{ \s* [^{}|]+? (?:\|([^}]*))? \s* }}}`), (_, _name, defaultVal) => {
+            .replace(re(r`{{{ \s* [^{}|]+? (?:\|([^}]*))? \s* }}}`), (_, defaultVal) => {
                 return defaultVal ?? '';
             })
 
