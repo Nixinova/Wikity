@@ -9,11 +9,6 @@ const r = String.raw;
 const MAX_RECURSION: number = 20;
 const arg: string = r`\s*([^|}]+?)\s*`;
 
-function escapeForOutput(text: string) {
-    return htmlEscape(text)
-        .replace(/{/g, '&#123;') // avoid keeping plain {{}} which is parsed as a template call
-}
-
 function cleanLink(link: string) {
     return encodeURI(link.replace(/ /g, '_'));
 }
@@ -375,7 +370,7 @@ export function parse(data: string, config: Config = {}): Result {
     for (let i = 0; i < nowikis.length; i++) {
         outText = outText
             // Restore nowiki contents
-            .replace(escaper('NOWIKI', i), escapeForOutput(nowikis[i]))
+            .replace(escaper('NOWIKI', i), nowikis[i])
     }
     outText = outText
         // References: <references />
@@ -389,6 +384,10 @@ export function parse(data: string, config: Config = {}): Result {
         // Magic word functions
         .replaceAll(escaper('VERT'), '|')
         .replaceAll(escaper('EQUALS'), '=')
+
+    // Escape all {{ to avoid crashes
+    outText = outText
+        .replaceAll('{{', '&#123;&#123;')
 
     const result: Result = { data: outText, metadata: metadata };
     return result;
