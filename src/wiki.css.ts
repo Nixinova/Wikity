@@ -27,4 +27,8 @@ a.redlink:visited {color: #b44;}
 #page+toc {border: 1px solid #aab; padding: 8px; width: fit-content; background-color: #f8f8f8; font-size: 95%;}
 #page+toc-heading {display: block; text-align: center;}
 #page+toc ol {margin: 0 0 0 1.3em;}
+
+#infobox {float: right; clear: right; margin: 0 0 1em 1em; width: 300px; padding: 2px; border: 1px solid #CCC; overflow: auto; font-size: 90%;}
+#infobox tr:first-child :first-child {padding: 10px 10px 0; text-align: center; font-weight: bold; font-size: 120%;}
+#infobox th {padding-left: 10px; text-align: left;}
 `

@@ -257,7 +257,6 @@ export function parse(data: string, config: Config = {}): Result {
                 if (params.includes('{{')) return _;
 
                 const templateFile = title.trim().replace(/ /g, '_');
-                console.log({ templateFile })
                 const page: string = paths.join(templatesFolder, templateFile);
                 let content = '';
                 // Try retrieve template content

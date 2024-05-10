@@ -3,6 +3,7 @@
 ## Next
 - Added support for video embeds: currently only supports `{{#ev:youtube}}` and `{{#ev:vimeo}}`.
 - Added support for named references.
+- Added styling for infoboxes (`#infobox`).
 - Changed images to be displayed inline by default when no float is given.
 - Fixed a crash occurring when attempting to apply custom styles.
 - Fixed a crash occurring when a template goes unparsed.
