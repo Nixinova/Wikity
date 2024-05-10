@@ -253,10 +253,12 @@ export function parse(data: string, config: Config = {}): Result {
             })
 
             // Templates: {{template}}
-            .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
+            .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) \s* (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
                 if (params.includes('{{')) return _;
 
-                const page: string = paths.join(templatesFolder, title.trim().replace(/ /g, '_'));
+                const templateFile = title.trim().replace(/ /g, '_');
+                console.log({ templateFile })
+                const page: string = paths.join(templatesFolder, templateFile);
                 let content = '';
                 // Try retrieve template content
                 try {
@@ -328,18 +330,21 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`</dl> (\s*?) <dl>`), '$1')
 
             // Tables: {|, |+, !, |-, |, |}
-            // {| data (open table)
-            .replace(re(r`^ \{\| (.*?) $`), (_, attrs) => `<table ${attrs}><tr>`)
-            // |+ data
-            .replace(re(r`^ \|\+ (.*?) $`), (_, content) => `<caption>${content}</caption>`)
-            // |- (new row)
-            .replace(re(r`^ \|- (.*?) $`), (_, attrs) => `</tr><tr ${attrs}>`)
-            // |} (close)
-            .replace(re(r`^ \|\}`), `</tr></table>`)
-            // content: !head, !data|head, |text, |data|text, !!head, ||data
-            .replace(re(r`( ^! | ^\| | !! | \|\| ) (?: ( [^|\n]+? ) \|)? ( [^|\n]*? ) (?= $ | !! | \|\| )`), (_, type, data, content) => {
-                const elem = /!/.test(type) ? 'th' : 'td';
-                return `<${elem} ${data ?? ''}>${content}</${elem}>`;
+            .replace(/\{\|.+\|\}/gs, (tableInner) => {
+                return tableInner
+                    // {| data (open table)
+                    .replace(re(r`^ \{\| (.*?) $`), (_, attrs) => `<table ${attrs}><tr>`)
+                    // |+ data
+                    .replace(re(r`^ \|\+ (.*?) $`), (_, content) => `<caption>${content}</caption>`)
+                    // |- (new row)
+                    .replace(re(r`^ \|- (.*?) $`), (_, attrs) => `</tr><tr ${attrs}>`)
+                    // |} (close)
+                    .replace(re(r`^ \|\}`), `</tr></table>`)
+                    // content: !head, !data|head, |text, |data|text, !!head, ||data
+                    .replace(re(r`( ^! | ^\| | !! | \|\| ) (?: ( [^|\n]+? ) \|)? ( [^|\n]*? ) (?= $ | !! | \|\| )`), (_, type, data, content) => {
+                        const elem = /!/.test(type) ? 'th' : 'td';
+                        return `<${elem} ${data ?? ''}>${content}</${elem}>`;
+                    })
             })
 
             // References: <ref></ref>
