@@ -1,6 +1,6 @@
 {
   "name": "wikity",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Compile wikitext to HTML: wikitext as a templating language.",
   "main": "dist/index.js",
   "scripts": {

@@ -72,6 +72,8 @@ __TOC__
 = TemplateCall =
 * {{subst}} = '''Substituted text: Null!'''; Unset: (empty); Named: (empty)
 * {{subst|Hello!}} = '''Substituted text: Hello!!'''; Unset: (empty); Named: (empty)
+* {{subst|1=Hello!}} = '''Substituted text: Hello!!'''; Unset: (empty); Named: (empty)
+* {{subst|1= {{plain|text}} }} = '''Substituted text: plain=text!!'''; Unset: (empty); Named: (empty)
 * {{subst|named=Named}} = '''Substituted text: Null!'''; Unset: (empty); Named: Named
 * {{subst|named=
 This [[object]] and this ''[[Item|item]]'' are not <span style="color:pink;">coloured</span>!

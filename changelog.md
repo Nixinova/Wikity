@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.3.4
+*2024-05-18*
 - Added support for video embeds: currently only supports `{{#ev:youtube}}` and `{{#ev:vimeo}}`.
 - Added support for named references.
 - Added styling for infoboxes (`#infobox`).
