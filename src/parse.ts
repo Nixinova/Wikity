@@ -269,20 +269,21 @@ export function parse(data: string, config: Config = {}): Result {
                 }
 
                 // Remove non-template sections
-                content = content
+                content = content.trim()
                     .replace(/<noinclude>.*?<\/noinclude>/gs, '')
                     .replace(/.*<(includeonly|onlyinclude)>|<\/(includeonly|onlyinclude)>.*/gs, '')
 
                 // Substitute arguments
                 const argMatch = (arg: string): RegExp => re(r`{{{ \s* ${arg} (?:\|([^}]*))? \s* }}}`);
                 const args: string[] = params.split('|');
-                // provided key=value template arguments
+                // parse provided key=value template arguments
                 for (let i = 1; i < args.length; i++) {
-                    const parts = args[i].split('=');
-                    const [arg, val] = parts[1]
-                        ? [parts[0], parts.slice(1).join('=')]
-                        : [i.toString(), parts[0]];
-                    content = content.replace(argMatch(arg), (_, defaultVal) => val || defaultVal || '');
+                    const data = args[i];
+                    const parts = data.split('=');
+                    const isNamed = parts.length > 1;
+                    const arg = isNamed ? parts[0] : i.toString();
+                    const val = isNamed ? parts.slice(1).join('') : data;
+                    content = content.replace(argMatch(arg), (_, defaultVal) => (val || defaultVal || '').trim());
                 }
 
                 return content;
