@@ -9,6 +9,7 @@
 - Fixed images being erroneously parsed as regular links.
 - Fixed internal links.
 - Fixed the TOC being inline in the default styles.
+- Fixed CSS selector for TOC heading not being specific enough.
 
 ## 1.3.3
 *2024-05-08*

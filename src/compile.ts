@@ -58,15 +58,15 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 toc += `${`<ol>`.repeat(lvl - 1)} <li> <a href="#${encodeURI(text.replace(/ /g, '_'))}">${text}</a> </li> ${`</ol>`.repeat(lvl - 1)}`;
             });
             const tocElem = dedent`
-                <div id="toc">
-                    <span id="toc-heading">
+                <div id="page+toc">
+                    <span id="page+toc+heading">
                         <strong>Contents</strong>
                         [<a href="javascript:void(0)" onclick="
-                            document.querySelector('#toc ol').setAttribute('style', this.innerText === 'hide' ? 'display: none;' : '');
+                            document.getElementById('page+toc+contents').setAttribute('style', this.innerText === 'hide' ? 'display: none;' : '');
                             this.innerText = this.innerText === 'hide' ? 'show' : 'hide';
                         ">hide</a>]
                     </span>
-                    <ol>${toc}</ol>
+                    <ol id="page+toc+contents">${toc}</ol>
                 </div>
             `;
             // Set TOC on page
