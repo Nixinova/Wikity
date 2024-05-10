@@ -5,6 +5,7 @@
 - Changed images to be displayed inline by default when no float is given.
 - Fixed unused parameters being substituted with random numbers instead of their default values.
 - Fixed files and links becoming broken when parameters are inside them.
+- Fixed lists not outputting properly when a parser function is used on the line.
 - Fixed images being erroneously parsed as regular links.
 - Fixed internal links.
 

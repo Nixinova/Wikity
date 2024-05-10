@@ -301,16 +301,28 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`^ (=+) \s* (.+?) \s* \1 \s* $`), (_, lvl, txt) => `<h${lvl.length} id="${encodeURI(txt.replace(/ /g, '_'))}">${txt}</h${lvl.length}>`)
 
             // Bulleted list: *item
-            .replace(re(r`^ (\*+) (.+?) $`), (_, lvl, txt) => `${'<ul>'.repeat(lvl.length)}<li>${txt}</li>${'</ul>'.repeat(lvl.length)}`)
+            .replace(re(r`^ (\*+) (.+?) $`), (_, lvl, content) => {
+                if (content.includes('{{')) return _;
+                const depth = lvl.length;
+                return `${'<ul>'.repeat(depth)}<li>${content}</li>${'</ul>'.repeat(depth)}`;
+            })
             .replace(re(r`</ul> (\s*?) <ul>`), '$1')
 
             // Numbered list: #item
-            .replace(re(r`^ (#+) (.+?) $`), (_, lvl, txt) => `${'<ol>'.repeat(lvl.length)}<li>${txt}</li>${'</ol>'.repeat(lvl.length)}`)
+            .replace(re(r`^ (#+) (.+?) $`), (_, lvl, content) => {
+                if (content.includes('{{')) return _;
+                const depth = lvl.length;
+                return `${'<ol>'.repeat(depth)}<li>${content}</li>${'</ol>'.repeat(depth)}`;
+            })
             .replace(re(r`</ol> (\s*?) <ol>`), '$1')
 
             // Definition list: ;head, :item
             .replace(re(r`^ ; (.+?) : (.+?) $`), `<dl><dt>$1</td><dd>$2</dd></dl>`)
-            .replace(re(r`^ (:+) (.+?) $`), (_, lvl, txt) => `${'<dl>'.repeat(lvl.length)}<dd>${txt}</dd>${'</dl>'.repeat(lvl.length)}`)
+            .replace(re(r`^ (:+) (.+?) $`), (_, lvl, content) => {
+                if (content.includes('{{')) return _;
+                const depth = lvl.length;
+                return `${'<dl>'.repeat(depth)}<dd>${content}</dd>${'</dl>'.repeat(depth)}`
+            })
             .replace(re(r`^ ; (.+) $`), '<dl><dt>$1</dt></dl>')
             .replace(re(r`</dl> (\s*?) <dl>`), '$1')
 
