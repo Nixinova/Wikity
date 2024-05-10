@@ -29,6 +29,8 @@ function parseDimensions(dimStr: string) {
     };
 }
 
+const escaper = (text: string, n: number = 0) => `%${text}#${n}`;
+
 export function rawParse(data: string, config: Config = {}): string {
     return parse(data, config).data;
 }
@@ -49,8 +51,6 @@ export function parse(data: string, config: Config = {}): Result {
     let refCount: number = 0;
 
     let outText: string = data;
-
-    const escaper = (text: string, n: number = 0) => `%${text}#${n}`;
 
     for (let l = 0, last = ''; l < MAX_RECURSION; l++) {
         if (last === outText) break;
@@ -357,7 +357,7 @@ export function parse(data: string, config: Config = {}): Result {
     // Restore nowiki contents
     for (let i = 0; i < nowikis.length; i++) {
         outText = outText
-            .replace(escaper('NOWIKI', i), (_, n) => fullyEscape(nowikis[n]))
+            .replace(escaper('NOWIKI', i), fullyEscape(nowikis[i]))
     }
     // Substitute magic word functions
     outText = outText
