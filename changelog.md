@@ -7,6 +7,7 @@
 - Fixed a crash occurring when attempting to apply custom styles.
 - Fixed unused parameters being substituted with random numbers instead of their default values.
 - Fixed templates not being trimmed before being substituted.
+- Fixed tables not allowing attributes syntax.
 - Fixed files and links becoming broken when parameters are inside them.
 - Fixed lists not outputting properly when a parser function is used on the line.
 - Fixed images being erroneously parsed as regular links.

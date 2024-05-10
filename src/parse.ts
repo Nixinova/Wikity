@@ -333,13 +333,19 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`</dl> (\s*?) <dl>`), '$1')
 
             // Tables: {|, |+, !, |-, |, |}
+            // {| data (open table)
             .replace(re(r`^ \{\| (.*?) $`), (_, attrs) => `<table ${attrs}><tr>`)
-            .replace(re(r`^ ! ([^]+?) (?= \n^[!|] )`), (_, content) => `<th>${content}</th>`)
+            // |+ data
             .replace(re(r`^ \|\+ (.*?) $`), (_, content) => `<caption>${content}</caption>`)
-            .replace(re(r`^ \|[^-+}] ([^]*?) (?= \n | \|\| )`), (_, content) => `<td>${content}</td>`)
-            .replace(re(r`\|\|[^-+}] ([^]*?) (?= \n | \|\| )`), (_, content) => `<td>${content}</td>`)
+            // |- (new row)
             .replace(re(r`^ \|- (.*?) $`), (_, attrs) => `</tr><tr ${attrs}>`)
+            // |} (close)
             .replace(re(r`^ \|\}`), `</tr></table>`)
+            // content: !head, !data|head, |text, |data|text, !!head, ||data
+            .replace(re(r`( ^! | ^\| | !! | \|\| ) (?: ( [^|\n]+? ) \|)? ( [^|\n]*? ) (?= $ | !! | \|\| )`), (_, type, data, content) => {
+                const elem = /!/.test(type) ? 'th' : 'td';
+                return `<${elem} ${data ?? ''}>${content}</${elem}>`;
+            })
 
             // References: <ref></ref>
             .replace(re(r`< ref \s* (?: name \s* = \s* ["']? ([^>'"]+) ["']? [^>]* )?> (.+?) </ ref >`), (_, refname, text) => {

@@ -1,7 +1,8 @@
+{{displaytitle: Example Page}}
 '''Wikity''' is a very useful build tool!
 
 <div style="border:1px solid">
-<h1>Headings</h1>
+= Headings =
 = Root =
 == Heading ==
 === Subheading ===
@@ -10,18 +11,18 @@
 </div>
 
 <div style="border:1px solid">
-<h1>TOC</h1>
+= TOC =
 __TOC__
 
 <div style="border:1px solid">
-<h1>Formatting</h1>
+= Formatting =
 ''Italic''
 '''Bold'''
 '''''Bold Italic'''''
 </div>
 
 <div style="border:1px solid">
-<h1>List</h1>
+= List =
 * Bulleted list
 * Bulleted list item 2
 ** Sub-item
@@ -39,18 +40,18 @@ __TOC__
 </div>
 
 <div style="border:1px solid">
-<h1>HorizontalRule</h1>
+= HorizontalRule =
 -----
 </div>
 
 <div style="border:1px solid">
-<h1>InternalLink</h1>
+= InternalLink =
 [[Link]]
 [[Link|Text]]
 </div>
 
 <div style="border:1px solid">
-<h1>FileEmbed</h1>
+= FileEmbed =
 [[File:Example.png]]
 [[File:Example.png|48px]]
 [[File:Example.png|48x50px]]
@@ -61,14 +62,14 @@ __TOC__
 </div>
 
 <div style="border:1px solid">
-<h1>ExternalLink</h1>
+= ExternalLink =
 [https://github.com]
 [https://google.com External link]
 [not a link]
 </div>
 
 <div style="border:1px solid">
-<h1>TemplateCall</h1>
+= TemplateCall =
 * {{subst}} = '''Substituted text: Null!'''; Unset: (empty); Named: (empty)
 * {{subst|Hello!}} = '''Substituted text: Hello!!'''; Unset: (empty); Named: (empty)
 * {{subst|named=Named}} = '''Substituted text: Null!'''; Unset: (empty); Named: Named
@@ -79,14 +80,27 @@ This [[object]] and this ''[[Item|item]]'' are not <span style="color:pink;">col
 </div>
 
 <div style="border:1px solid">
-<h1>HTML</h1>
+= References =
+
+Text.
+<ref>Simple reference</ref>
+<ref name="named">Named reference</ref>
+<ref name="named" />
+
+; References
+{{reflist}}
+
+</div>
+
+<div style="border:1px solid">
+= HTML =
 <script src="malicious.js"></script>
 <div onclick="malicious()"></div>
 <code>Code</code>
 </div>
 
 <div style="border:1px solid">
-<h1>CodeBock</h1>
+= CodeBock =
 ``code``
 ```
 code block
@@ -95,21 +109,25 @@ code block
 </div>
 
 <div style="border:1px solid">
-<h1>Table</h1>
+= Table =
 {| class="wikitable"
 |+ Caption
-! Heading
-! Heading
-|- class="row"
-| Cell
-| Cell
 |-
-| Inline || Inline
+! Head1
+! Head2 !! Head3
+! color=red | Head4
+|- class="row"
+| Cell1
+| Cell2 || Cell3
+| Cell4
+|-
+| Inline1 || Inline2
+! End1 || End2
 |}
 </div>
 
 <div style="border:1px solid">
-<h1>Nowiki</h1>
+= Nowiki =
 <nowiki>
 Non-parsed content &amp; tags.
 {{#vardefine: varname | var text }}
@@ -118,7 +136,7 @@ Non-parsed content &amp; tags.
 </div>
 
 <div style="border:1px solid">
-<h1>TextFunctions</h1>
+= TextFunctions =
 Each side of the <code>=</code> must match.
 * {{#lc:TEXT}}             = text
 * {{#ucfirst:text}}        = Text
@@ -134,15 +152,15 @@ Each side of the <code>=</code> must match.
 </div>
 
 <div style="border:1px solid">
-<h1>MagicFunctions</h1>
+= MagicFunctions =
 {{#unknown:foo}}
 {{#ev:youtube|dQw4w9WgXcQ}}
-{{#ev:youtube|dQw4w9WgXcQ|100px|left|Important video.}}
+{{#ev:youtube|dQw4w9WgXcQ|600px|left|Important video.}}
 <div style="clear:both;"></div>
 </div>
 
 <div style="border:1px solid">
-<h1>ParserFunctions</h1>
+= ParserFunctions =
 Each side of the <code>&rarr;</code> must match.
 * {{#if: true | true text | false text }} &rarr; true text
 * {{#if: {{{variable|}}} | true text | false text }} &rarr; false text
@@ -167,7 +185,4 @@ Each side of the <code>&rarr;</code> must match.
 * {{#var: nested}} &rarr; nil =.
 </div>
 
-<div style="border:1px solid">
-<h1>Other</h1>
-{{displaytitle: Example Page}}
-</div>
+{{Footer}}
