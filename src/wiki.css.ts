@@ -23,7 +23,7 @@ a.external-link::after {content: '\1f855';}
 a.redlink {color: #d33;}
 a.redlink:visited {color: #b44;}
 
-#toc {display: inline-block; border: 1px solid #aab; padding: 8px; background-color: #f8f8f8; font-size: 95%;}
+#toc {border: 1px solid #aab; padding: 8px; width: fit-content; background-color: #f8f8f8; font-size: 95%;}
 #toc-heading {display: block; text-align: center;}
 #toc ol {margin: 0 0 0 1.3em;}
 `

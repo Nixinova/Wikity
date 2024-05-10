@@ -8,6 +8,7 @@
 - Fixed lists not outputting properly when a parser function is used on the line.
 - Fixed images being erroneously parsed as regular links.
 - Fixed internal links.
+- Fixed the TOC being inline in the default styles.
 
 ## 1.3.3
 *2024-05-08*
