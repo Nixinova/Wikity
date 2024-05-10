@@ -352,12 +352,12 @@ export function parse(data: string, config: Config = {}): Result {
 
                 const refData = { ref: text, n: refs.length + 1, name: refname };
                 refs.push(refData);
-                return `<sup><a id="cite-${refData.n}" class="ref" href="#ref-${refData.n}">[${refData.n}]</a></sup>`
+                return `<sup class="refnote"><a id="cite-${refData.n}" class="ref" href="#ref-${refData.n}">[${refData.n}]</a></sup>`
             })
             .replace(re(r`< ref \s* name \s* = \s* ["']? ( [^>"']+ ) ["']? \s* (?: /> | > .* </ref> )`), (_, refname) => {
                 const ref = refs.find(ref => ref.name === refname);
                 if (!ref) return '';
-                return `<sup><a id="cite-${ref.n}" class="ref" href="#ref-${ref.n}">[${ref.n}]</a></sup>`
+                return `<sup class="refnote"><a id="cite-${ref.n}" class="ref" href="#ref-${ref.n}">[${ref.n}]</a></sup>`
             })
 
             // Nonstandard: ``code`` and ```code blocks```
