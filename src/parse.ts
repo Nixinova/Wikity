@@ -31,8 +31,6 @@ function parseDimensions(dimStr: string) {
 
 const escaper = (text: string, n: number = 0) => `%${text}#${n}`;
 
-const EQ = escaper('EQUALS');
-
 export function rawParse(data: string, config: Config = {}): string {
     return parse(data, config).data;
 }
@@ -120,12 +118,12 @@ export function parse(data: string, config: Config = {}): Result {
                 }
                 let content = `
                     <figure
-                        class${EQ}"
+                        class="
                             ${imageData.class || ''}
                             image-container
                             image-${imageData.type || 'default'}
                         "
-                        style${EQ}"
+                        style="
                             display: inline-block;
                             float: ${imageData.float || 'none'};
                             vertical-align: ${imageData.align || 'unset'};
@@ -133,17 +131,17 @@ export function parse(data: string, config: Config = {}): Result {
                         "
                     >
                         <img
-                            src${EQ}"${paths.basename(imagesFolder)}/${paths.relative(imagesFolder, path)}"
-                            alt${EQ}"${imageData.alt || file}"
-                            width${EQ}"${imageData.width || 300}"
-                            height${EQ}"${imageData.height || 300}"
+                            src="${paths.basename(imagesFolder)}/${paths.relative(imagesFolder, path)}"
+                            alt="${imageData.alt || file}"
+                            width="${imageData.width || 300}"
+                            height="${imageData.height || 300}"
                         >
                         ${imageData.hasCaption ? `<figcaption>${caption}</figcaption>` : ''}
                     </figure>
                 `;
                 const imageLink = imageData.link;
                 if (imageLink) {
-                    content = `<a href${EQ}"${cleanLink(imageLink)}" title${EQ}"${imageLink}">${content}</a>`;
+                    content = `<a href="${cleanLink(imageLink)}" title="${imageLink}">${content}</a>`;
                 }
                 return content;
             })
@@ -151,12 +149,12 @@ export function parse(data: string, config: Config = {}): Result {
             // Internal links: [[Page]] and [[Page|Text]]
             .replace(re(r`\[\[ ([^\]|]+?) \]\]`), (_, link) => {
                 if (_.includes('{{')) return _;
-                const content = `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${link}</a>`;
+                const content = `<a class="internal-link" title="${link}" href="./${cleanLink(link)}">${link}</a>`;
                 return content;
             })
             .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), (_, link, text) => {
                 if (link.includes('{{')) return _;
-                const content = `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${text}</a>`;
+                const content = `<a class="internal-link" title="${link}" href="./${cleanLink(link)}">${text}</a>`;
                 return content;
             })
             .replace(re(r`(</a>)([a-z]+)`), '$2$1')
@@ -164,7 +162,7 @@ export function parse(data: string, config: Config = {}): Result {
             // External links: [href Page] and just [href]
             .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => {
                 if (_.includes('{{')) return _;
-                const content = `<a class${EQ}"external-link" href${EQ}"${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`
+                const content = `<a class="external-link" href="${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`
                 return content;
             })
 
@@ -211,14 +209,14 @@ export function parse(data: string, config: Config = {}): Result {
                 }[platform];
                 if (!source) return `<code>Failed to load video ${id} from ${platform}.</code>`;
                 return `
-                    <iframe key${EQ}"${KEY}"
-                        src${EQ}"${source}"
-                        width${EQ}"${width}"
-                        height${EQ}"${height}"
-                        frameborder${EQ}"0"
-                        allowfullscreen${EQ}"true"
-                        loading${EQ}"lazy"
-                        title${EQ}"${description ?? 'Play video'}"
+                    <iframe key="${KEY}"
+                        src="${source}"
+                        width="${width}"
+                        height="${height}"
+                        frameborder="0"
+                        allowfullscreen="true"
+                        loading="lazy"
+                        title="${description ?? 'Play video'}"
                         ${alignment ? `style="float: ${alignment};"` : ''}
                     >
                     </iframe>
@@ -261,6 +259,8 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Templates: {{template}}
             .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
+                if (params.includes('{{')) return _;
+
                 const page: string = paths.join(templatesFolder, title.trim().replace(/ /g, '_'));
                 let content = '';
                 // Try retrieve template content
@@ -270,7 +270,7 @@ export function parse(data: string, config: Config = {}): Result {
                 catch {
                     // Return redlink if template doesn't exist
                     const relPage = paths.basename(templatesFolder) + '/' + paths.relative(templatesFolder, page);
-                    return `<a class${EQ}"internal-link redlink" title${EQ}"${title}" href${EQ}"${relPage}">${title}</a>`;
+                    return `<a class="internal-link redlink" title="${title}" href="${relPage}">${title}</a>`;
                 }
 
                 // Remove non-template sections
@@ -287,7 +287,7 @@ export function parse(data: string, config: Config = {}): Result {
                     const parts = data.split('=');
                     const isNamed = parts.length > 1;
                     const arg = isNamed ? parts[0] : i.toString();
-                    const val = isNamed ? parts.slice(1).join('') : data;
+                    const val = isNamed ? parts.slice(1).join('=') : data;
                     content = content.replace(argMatch(arg), (_, defaultVal) => (val || defaultVal || '').trim());
                 }
 
@@ -353,12 +353,12 @@ export function parse(data: string, config: Config = {}): Result {
 
                 const refData = { ref: text, n: refs.length + 1, name: refname };
                 refs.push(refData);
-                return `<sup><a id${EQ}"cite-${refData.n}" class${EQ}"ref" href${EQ}"#ref-${refData.n}">[${refData.n}]</a></sup>`
+                return `<sup><a id="cite-${refData.n}" class="ref" href="#ref-${refData.n}">[${refData.n}]</a></sup>`
             })
             .replace(re(r`< ref \s* name \s* = \s* ["']? ( [^>"']+ ) ["']? \s* (?: /> | > .* </ref> )`), (_, refname) => {
                 const ref = refs.find(ref => ref.name === refname);
                 if (!ref) return '';
-                return `<sup><a id${EQ}"cite-${ref.n}" class${EQ}"ref" href${EQ}"#ref-${ref.n}">[${ref.n}]</a></sup>`
+                return `<sup><a id="cite-${ref.n}" class="ref" href="#ref-${ref.n}">[${ref.n}]</a></sup>`
             })
 
             // Nonstandard: ``code`` and ```code blocks```
@@ -381,7 +381,7 @@ export function parse(data: string, config: Config = {}): Result {
         // References: <references />
         .replace(re(r`<references \s* /?>`), () => {
             const references = refs.map(({ ref, n }) => {
-                const refline = `<li id="ref-${n}"> <a href${EQ}"#cite-${n}">↑</a> ${ref} </li>`
+                const refline = `<li id="ref-${n}"> <a href="#cite-${n}">↑</a> ${ref} </li>`
                 return refline;
             }).join('\n');
             return `<ol>${references}</ol>`;
