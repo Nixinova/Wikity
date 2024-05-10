@@ -341,8 +341,10 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`^ \|- (.*?) $`), (_, attrs) => `</tr><tr ${attrs}>`)
             .replace(re(r`^ \|\}`), `</tr></table>`)
 
-            // References: <ref></ref>, <references/>
+            // References: <ref></ref>
             .replace(re(r`< ref \s* (?: name \s* = \s* ["']? ([^>'"]+) ["']? [^>]* )?> (.+?) </ ref >`), (_, refname, text) => {
+                if (_.includes('{{')) return _;
+
                 const refData = { ref: text, n: refs.length + 1, name: refname };
                 refs.push(refData);
                 return `<sup><a id${EQ}"cite-${refData.n}" class${EQ}"ref" href${EQ}"#ref-${refData.n}">[${refData.n}]</a></sup>`
@@ -352,9 +354,6 @@ export function parse(data: string, config: Config = {}): Result {
                 if (!ref) return '';
                 return `<sup><a id${EQ}"cite-${ref.n}" class${EQ}"ref" href${EQ}"#ref-${ref.n}">[${ref.n}]</a></sup>`
             })
-            .replace(re(r`<references \s* /?>`), '<ol>' + refs.map(({ ref }, i) =>
-                `<li id="ref-${+i + 1}"> <a href${EQ}"#cite-${+i + 1}">↑</a> ${ref} </li>`).join('\n') + '</ol>'
-            )
 
             // Nonstandard: ``code`` and ```code blocks```
             .replace(re(r` \`\`\` ([^\`]+?) \`\`\` `), '<pre>$1</pre>')
@@ -365,13 +364,23 @@ export function parse(data: string, config: Config = {}): Result {
 
     }
 
-    // Restore nowiki contents
+    // Final (one-time) substitutions
+
     for (let i = 0; i < nowikis.length; i++) {
         outText = outText
+            // Restore nowiki contents
             .replace(escaper('NOWIKI', i), escapeForOutput(nowikis[i]))
     }
-    // Substitute magic word functions
     outText = outText
+        // References: <references />
+        .replace(re(r`<references \s* /?>`), () => {
+            const references = refs.map(({ ref, n }) => {
+                const refline = `<li id="ref-${n}"> <a href${EQ}"#cite-${n}">↑</a> ${ref} </li>`
+                return refline;
+            }).join('\n');
+            return `<ol>${references}</ol>`;
+        })
+        // Magic word functions
         .replaceAll(escaper('VERT'), '|')
         .replaceAll(escaper('EQUALS'), '=')
 
