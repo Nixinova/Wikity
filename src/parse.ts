@@ -9,7 +9,7 @@ const r = String.raw;
 const MAX_RECURSION: number = 20;
 const arg: string = r`\s*([^|}]+?)\s*`;
 
-function fullyEscape(text: string) {
+function escapeForOutput(text: string) {
     return htmlEscape(text)
         .replace(/{/g, '&#123;') // avoid keeping plain {{}} which is parsed as a template call
 }
@@ -30,6 +30,8 @@ function parseDimensions(dimStr: string) {
 }
 
 const escaper = (text: string, n: number = 0) => `%${text}#${n}`;
+
+const EQ = escaper('EQUALS');
 
 export function rawParse(data: string, config: Config = {}): string {
     return parse(data, config).data;
@@ -62,7 +64,7 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`<nowiki> ([^]+?) </nowiki>`), (_, m) => (nowikis.push(m), escaper('NOWIKI', nowikiCount++)))
 
             // Sanitise unacceptable HTML
-            .replace(re(r`< \s* (?= (?: script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea ) (?! \s* key=.?${KEY}) )`), '&lt;$1')
+            .replace(re(r`< \s* (?= (?: script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea ) (?! \s* key.{0,10}${KEY}) )`), '&lt;')
             .replace(re(r`(?<= <[^>]+ ) (\bon(\w+))`), 'data-$2')
 
             // Comments: <!-- -->
@@ -119,12 +121,12 @@ export function parse(data: string, config: Config = {}): Result {
                 }
                 let content = `
                     <figure
-                        class="
+                        class${EQ}"
                             ${imageData.class || ''}
                             image-container
                             image-${imageData.type || 'default'}
                         "
-                        style="
+                        style${EQ}"
                             display: inline-block;
                             float: ${imageData.float || 'none'};
                             vertical-align: ${imageData.align || 'unset'};
@@ -132,17 +134,17 @@ export function parse(data: string, config: Config = {}): Result {
                         "
                     >
                         <img
-                            src="${paths.basename(imagesFolder)}/${paths.relative(imagesFolder, path)}"
-                            alt="${imageData.alt || file}"
-                            width="${imageData.width || 300}"
-                            height="${imageData.height || 300}"
+                            src${EQ}"${paths.basename(imagesFolder)}/${paths.relative(imagesFolder, path)}"
+                            alt${EQ}"${imageData.alt || file}"
+                            width${EQ}"${imageData.width || 300}"
+                            height${EQ}"${imageData.height || 300}"
                         >
                         ${imageData.hasCaption ? `<figcaption>${caption}</figcaption>` : ''}
                     </figure>
                 `;
                 const imageLink = imageData.link;
                 if (imageLink) {
-                    content = `<a href="${cleanLink(imageLink)}" title="${imageLink}">${content}</a>`;
+                    content = `<a href${EQ}"${cleanLink(imageLink)}" title${EQ}"${imageLink}">${content}</a>`;
                 }
                 return content;
             })
@@ -151,17 +153,17 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`\[\[ ([^\]|]+?) \]\]`), (_, link) => {
                 if (link.includes('{{')) return _;
 
-                return `<a class{{=}}"internal-link" title{{=}}"${link}" href{{=}}"./${cleanLink(link)}">${link}</a>`;
+                return `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${link}</a>`;
             })
             .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), (_, link, text) => {
                 if (link.includes('{{')) return _;
 
-                return `<a class{{=}}"internal-link" title{{=}}"${link}" href{{=}}"./${cleanLink(link)}">${text}</a>`;
+                return `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${text}</a>`;
             })
             .replace(re(r`(</a>)([a-z]+)`), '$2$1')
 
             // External links: [href Page] and just [href]
-            .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => `<a class{{=}}"external-link" href{{=}}"${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`)
+            .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => `<a class${EQ}"external-link" href${EQ}"${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`)
 
             // Magic words: {{!}}, {{reflist}}, etc
             .replace(re(r`{{ \s* ! \s* }}`), escaper('VERT'))
@@ -204,9 +206,8 @@ export function parse(data: string, config: Config = {}): Result {
                     'vimeo': `//player.vimeo.com/video/${id}`,
                 }[platform];
                 if (!source) return `<code>Failed to load video ${id} from ${platform}.</code>`;
-                const EQ = escaper('EQUALS');
                 return `
-                    <iframe key="${KEY}"
+                    <iframe key${EQ}"${KEY}"
                         src${EQ}"${source}"
                         width${EQ}"${width}"
                         height${EQ}"${height}"
@@ -265,7 +266,7 @@ export function parse(data: string, config: Config = {}): Result {
                 catch {
                     // Return redlink if template doesn't exist
                     const relPage = paths.basename(templatesFolder) + '/' + paths.relative(templatesFolder, page);
-                    return `<a class="internal-link redlink" title="${title}" href="${relPage}">${title}</a>`;
+                    return `<a class${EQ}"internal-link redlink" title${EQ}"${title}" href${EQ}"${relPage}">${title}</a>`;
                 }
 
                 // Remove non-template sections
@@ -340,10 +341,10 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`<ref> (.+?) </ref>`), (_, text) => {
                 refs.push(text);
                 refCount++;
-                return `<sup><a id="cite-${refCount}" class="ref" href="#ref-${refCount}">[${refCount}]</a></sup>`
+                return `<sup><a id${EQ}"cite-${refCount}" class${EQ}"ref" href${EQ}"#ref-${refCount}">[${refCount}]</a></sup>`
             })
             .replace(re(r`<references \s* /?>`), '<ol>' + refs.map((ref, i) =>
-                `<li id="ref-${+i + 1}"> <a href="#cite-${+i + 1}">↑</a> ${ref} </li>`).join('\n') + '</ol>'
+                `<li id="ref-${+i + 1}"> <a href${EQ}"#cite-${+i + 1}">↑</a> ${ref} </li>`).join('\n') + '</ol>'
             )
 
             // Nonstandard: ``code`` and ```code blocks```
@@ -358,7 +359,7 @@ export function parse(data: string, config: Config = {}): Result {
     // Restore nowiki contents
     for (let i = 0; i < nowikis.length; i++) {
         outText = outText
-            .replace(escaper('NOWIKI', i), fullyEscape(nowikis[i]))
+            .replace(escaper('NOWIKI', i), escapeForOutput(nowikis[i]))
     }
     // Substitute magic word functions
     outText = outText

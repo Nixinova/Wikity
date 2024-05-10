@@ -8,6 +8,7 @@ dd, dl dl {margin-block: 0; margin-inline-start: 30px;}
 
 figure {margin: 1em;}
 .image-thumb, .image-frame {padding: 6px; border: 1px solid gray;}
+.image-default {margin: 0;}
 figcaption {padding-top: 6px;}
 
 table.wikitable {border-collapse: collapse;}
