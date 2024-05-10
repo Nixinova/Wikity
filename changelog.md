@@ -2,6 +2,7 @@
 
 ## Next
 - Added support for video embeds: currently only supports `{{#ev:youtube}}` and `{{#ev:vimeo}}`.
+- Added support for named references.
 - Changed images to be displayed inline by default when no float is given.
 - Fixed a crash occurring when attempting to apply custom styles.
 - Fixed unused parameters being substituted with random numbers instead of their default values.
@@ -9,7 +10,7 @@
 - Fixed files and links becoming broken when parameters are inside them.
 - Fixed lists not outputting properly when a parser function is used on the line.
 - Fixed images being erroneously parsed as regular links.
-- Fixed internal links.
+- Fixed internal links sometimes having wrong targets.
 - Fixed the TOC being inline in the default styles.
 - Fixed CSS selector for TOC heading not being specific enough.
 

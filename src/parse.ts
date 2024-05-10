@@ -47,10 +47,9 @@ export function parse(data: string, config: Config = {}): Result {
     const vars: Metadata = {};
     const metadata: Metadata = {};
     const nowikis: string[] = [];
-    const refs: string[] = [];
+    const refs: Array<{ ref: string, n: number, name: string }> = [];
     let nowikiCount: number = 0;
     let rawExtLinkCount: number = 0;
-    let refCount: number = 0;
 
     let outText: string = data;
 
@@ -151,22 +150,27 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Internal links: [[Page]] and [[Page|Text]]
             .replace(re(r`\[\[ ([^\]|]+?) \]\]`), (_, link) => {
-                if (link.includes('{{')) return _;
-
-                return `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${link}</a>`;
+                if (_.includes('{{')) return _;
+                const content = `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${link}</a>`;
+                return content;
             })
             .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), (_, link, text) => {
                 if (link.includes('{{')) return _;
-
-                return `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${text}</a>`;
+                const content = `<a class${EQ}"internal-link" title${EQ}"${link}" href${EQ}"./${cleanLink(link)}">${text}</a>`;
+                return content;
             })
             .replace(re(r`(</a>)([a-z]+)`), '$2$1')
 
             // External links: [href Page] and just [href]
-            .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => `<a class${EQ}"external-link" href${EQ}"${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`)
+            .replace(re(r`\[ ((?:\w+:)?\/\/ [^\s\]]+) (\s [^\]]+?)? \]`), (_, href, txt) => {
+                if (_.includes('{{')) return _;
+                const content = `<a class${EQ}"external-link" href${EQ}"${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`
+                return content;
+            })
 
             // Magic words: {{!}}, {{reflist}}, etc
             .replace(re(r`{{ \s* ! \s* }}`), escaper('VERT'))
+            .replace(re(r`{{ \s* !! \s* }}`), escaper('VERT').repeat(2))
             .replace(re(r`{{ \s* = \s* }}`), escaper('EQUALS'))
             .replace(re(r`{{ \s* [Rr]eflist \s* }}`), '<references/>')
 
@@ -338,12 +342,17 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`^ \|\}`), `</tr></table>`)
 
             // References: <ref></ref>, <references/>
-            .replace(re(r`<ref> (.+?) </ref>`), (_, text) => {
-                refs.push(text);
-                refCount++;
-                return `<sup><a id${EQ}"cite-${refCount}" class${EQ}"ref" href${EQ}"#ref-${refCount}">[${refCount}]</a></sup>`
+            .replace(re(r`< ref \s* (?: name \s* = \s* ["']? ([^>'"]+) ["']? [^>]* )?> (.+?) </ ref >`), (_, refname, text) => {
+                const refData = { ref: text, n: refs.length + 1, name: refname };
+                refs.push(refData);
+                return `<sup><a id${EQ}"cite-${refData.n}" class${EQ}"ref" href${EQ}"#ref-${refData.n}">[${refData.n}]</a></sup>`
             })
-            .replace(re(r`<references \s* /?>`), '<ol>' + refs.map((ref, i) =>
+            .replace(re(r`< ref \s* name \s* = \s* ["']? ( [^>"']+ ) ["']? \s* (?: /> | > .* </ref> )`), (_, refname) => {
+                const ref = refs.find(ref => ref.name === refname);
+                if (!ref) return '';
+                return `<sup><a id${EQ}"cite-${ref.n}" class${EQ}"ref" href${EQ}"#ref-${ref.n}">[${ref.n}]</a></sup>`
+            })
+            .replace(re(r`<references \s* /?>`), '<ol>' + refs.map(({ ref }, i) =>
                 `<li id="ref-${+i + 1}"> <a href${EQ}"#cite-${+i + 1}">↑</a> ${ref} </li>`).join('\n') + '</ol>'
             )
 
