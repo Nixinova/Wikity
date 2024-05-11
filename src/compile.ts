@@ -38,7 +38,8 @@ export function compile(dir: string = '.', config: Config = {}): void {
         const outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
         const outFilePath = paths.join(outputFolder, outFilename);
         const urlPath: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase()); // capitalise first letters
-        const displayTitle: string = metadata.displayTitle || urlPath.replace('.html', '');
+
+        const displayTitle: string = metadata.displayTitle || urlPath.replace('.html', '').replace(/_/g, ' ');
 
         // Eleventy configuration
         const frontMatter = config.eleventy ? dedent`

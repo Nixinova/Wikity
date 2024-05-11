@@ -3,6 +3,7 @@
 ## Next
 - Changed output to no longer be prettified.
 - Fixed spacing issues resulting from output prettification.
+- Fixed underscores appearing in the default page title when present in the URL.
 - Fixed links not being automatically capitalised.
 - Fixed named references not working.
 
