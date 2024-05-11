@@ -69,6 +69,7 @@ export function parse(data: string, config: Config = {}): Result {
             // Images: [[File:Image.png|options|caption]]
             .replace(re(r`\[\[ (?:File|Image): (.*?) (\|.+?)? \]\]`), (_, file, params = '') => {
                 if (params.includes('{{')) return _;
+                if (params.includes('[[')) return _;
                 if (!file) return '';
 
                 const path: string = paths.join(imagesFolder, file.trim().replace(/ /g, '_'));
@@ -249,7 +250,12 @@ export function parse(data: string, config: Config = {}): Result {
                             const errMsg = `Wikity does not use Wikipedia's #time function syntax. Use repetition-based formatting (e.g. yyyy-mm-dd) instead.`;
                             console.warn(`<Wikity> [WARN] ${errMsg}`);
                         }
-                        return dateFormat(args[1] ? new Date(args[1]) : new Date(), args[0]);
+                        try {
+                            return dateFormat(args[1] ? new Date(args[1]) : new Date(), args[0]);
+                        }
+                        catch {
+                            return args[1] || args[0];
+                        }
                 }
             })
 
