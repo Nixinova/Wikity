@@ -311,7 +311,10 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`''  ([^']+?)  ''`), '<i>$1</i>')
 
             // Headings: ==heading==
-            .replace(re(r`^ (=+) \s* (.+?) \s* \1 \s* $`), (_, lvl, txt) => `<h${lvl.length} id="${encodeURI(txt.replace(/ /g, '_'))}">${txt}</h${lvl.length}>`)
+            .replace(re(r`^ (=+) \s* (.+?) \s* \1 \s* $`), (_, lvl, txt) => {
+                const linkForm = encodeURI(txt.replace(/ /g, '_').replace(/<.+?>/g, ''));
+                return `<h${lvl.length} id="${linkForm}">${txt}</h${lvl.length}>`;
+            })
 
             // Bulleted list: *item
             .replace(re(r`^ (\*+) (.+?) $`), (_, lvl, content) => {

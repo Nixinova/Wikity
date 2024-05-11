@@ -53,7 +53,8 @@ export function compile(dir: string = '.', config: Config = {}): void {
             let toc = '';
             let headings = Array.from(parsedContent.match(/<h\d[^>]*>.+?<\/h\d>/gs) || []);
             headings.forEach(match => {
-                const text: string = match.replace(/\s*<\/?h\d[^>]*>\s*/g, '');
+                const headingInner: string = match.replace(/\s*<\/?h\d[^>]*>\s*/g, '');
+                const text = headingInner.replace(/<.+?>/g, ''); // remove tags from inner
                 const lvl: number = +(match.match(/\d/g)?.[0] || -1);
                 toc += `${`<ol>`.repeat(lvl - 1)} <li> <a href="#${encodeURI(text.replace(/ /g, '_'))}">${text}</a> </li> ${`</ol>`.repeat(lvl - 1)}`;
             });

@@ -8,6 +8,7 @@
 === Subheading ===
 == Broken heading ===
 ====== Small heading ======
+== ''fancy'' '''heading'''! ==
 </div>
 
 <div style="border:1px solid">
