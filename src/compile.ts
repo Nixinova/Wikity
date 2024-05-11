@@ -57,6 +57,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 const lvl: number = +(match.match(/\d/g)?.[0] || -1);
                 toc += `${`<ol>`.repeat(lvl - 1)} <li> <a href="#${encodeURI(text.replace(/ /g, '_'))}">${text}</a> </li> ${`</ol>`.repeat(lvl - 1)}`;
             });
+            toc = toc.replace(/<\/ol>\s*<ol>/g, '');
             const tocElem = dedent`
                 <div id="page+toc">
                     <span id="page+toc+heading">

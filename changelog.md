@@ -8,6 +8,7 @@
 - Fixed underscores appearing in the default page title when present in the URL.
 - Fixed links not being automatically capitalised.
 - Fixed named references not working.
+- Fixed all index numbers in the TOC being '1'.
 
 ## 1.3.4
 *2024-05-18*
