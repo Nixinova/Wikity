@@ -377,7 +377,7 @@ export function parse(data: string, config: Config = {}): Result {
                 refs.push(refData);
                 return `<sup class="refnote"><a id="cite-${refData.id}" class="ref" href="#ref-${refData.id}">[${refData.id}]</a></sup>`
             })
-            .replace(re(r`< ref \s* name \s* = \s* ["']? ( [^>"']+ ) ["']? \s* (?: /> | > .* </ref> )`), (_, refname) => {
+            .replace(re(r`< ref \s* name \s* = \s* ["']? ( [^>"']+ ) ["']? \s* (?: /> | > .*? </ref> )`), (_, refname) => {
                 const ref = refs.find(ref => ref.name === refname);
                 if (!ref) return _;
                 ref.i++;

@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.3.5
+*2024-05-12*
 - Changed output to no longer be prettified.
 - Fixed spacing issues resulting from output prettification.
 - Fixed a crash occurring when invalid dates are given to `#time`.

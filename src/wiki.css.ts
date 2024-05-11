@@ -1,5 +1,5 @@
 export default String.raw`
-body {font-family: sans-serif; margin: 4em; max-width: 1000px; background: #eee;}
+body {font-family: sans-serif; margin: auto; max-width: 1000px; background: #eee;}
 main {margin: 3em -1em; background: #fff; padding: 1em;}
 h1, h2 {margin-bottom: 0.6em; font-weight: normal; border-bottom: 1px solid #a2a9b1;}
 ul, ol {margin: 0.3em 0 0 1.6em; padding: 0;}
@@ -29,6 +29,6 @@ a.redlink:visited {color: #b44;}
 #page+toc ol {margin: 0 0 0 1.3em;}
 
 #infobox {float: right; clear: right; margin: 0 0 1em 1em; width: 300px; padding: 2px; border: 1px solid #CCC; overflow: auto; font-size: 90%;}
-#infobox tr:first-child :first-child {padding: 10px 10px 0; text-align: center; font-weight: bold; font-size: 120%;}
+#infobox tr:first-child :first-child {padding: 10px; text-align: center; font-weight: bold; font-size: 120%;}
 #infobox th {padding-left: 10px; text-align: left;}
 `
