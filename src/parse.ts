@@ -40,7 +40,7 @@ export function parse(data: string, config: Config = {}): Result {
     const vars: Metadata = {};
     const metadata: Metadata = {};
     const nowikis: string[] = [];
-    const refs: Array<{ ref: string, n: number, name: string }> = [];
+    const refs: Array<{ ref: string, id: number, name: string, i: number }> = [];
     let nowikiCount: number = 0;
     let rawExtLinkCount: number = 0;
 
@@ -350,14 +350,22 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`< ref \s* (?: name \s* = \s* ["']? ([^>'"]+) ["']? [^>]* )?> (.+?) </ ref >`), (_, refname, text) => {
                 if (_.includes('{{')) return _;
 
-                const refData = { ref: text, n: refs.length + 1, name: refname };
+                const refData = { ref: text, id: refs.length + 1, name: refname, i: 0 };
                 refs.push(refData);
-                return `<sup class="refnote"><a id="cite-${refData.n}" class="ref" href="#ref-${refData.n}">[${refData.n}]</a></sup>`
+                return `<sup class="refnote"><a id="cite-${refData.id}" class="ref" href="#ref-${refData.id}">[${refData.id}]</a></sup>`
             })
             .replace(re(r`< ref \s* name \s* = \s* ["']? ( [^>"']+ ) ["']? \s* (?: /> | > .* </ref> )`), (_, refname) => {
                 const ref = refs.find(ref => ref.name === refname);
-                if (!ref) return '';
-                return `<sup class="refnote"><a id="cite-${ref.n}" class="ref" href="#ref-${ref.n}">[${ref.n}]</a></sup>`
+                if (!ref) return _;
+                ref.i++;
+                const content = `
+                    <sup class="refnote">
+                        <a id="cite-${ref.id}${ref.i > 0 ? `_${ref.i}` : ''}" class="ref" href="#ref-${ref.id}">
+                            [${ref.id}]
+                        </a>
+                    </sup>
+                `;
+                return content;
             })
 
             // Nonstandard: ``code`` and ```code blocks```
@@ -379,8 +387,20 @@ export function parse(data: string, config: Config = {}): Result {
     outText = outText
         // References: <references />
         .replace(re(r`<references \s* /?>`), () => {
-            const references = refs.map(({ ref, n }) => {
-                const refline = `<li id="ref-${n}"> <a href="#cite-${n}">↑</a> ${ref} </li>`
+            const references = refs.map((refdata) => {
+                let multiRefContent = '';
+                if (refdata.i > 0) {
+                    for (let i = 0; i <= refdata.i; i++) {
+                        multiRefContent += `<sup><a href="#cite-${refdata.id}${i > 0 ? `_${i}` : ''}">${i + 1}</a></sup>`;
+                    }
+                }
+                const refline = `
+                    <li id="ref-${refdata.id}">
+                        ${refdata.i > 0 ? '&uarr;' : `<a href="#cite-${refdata.id}">&uarr;</a>`}
+                        ${multiRefContent}
+                        ${refdata.ref} 
+                    </li>
+                `;
                 return refline;
             }).join('\n');
             return `<ol>${references}</ol>`;

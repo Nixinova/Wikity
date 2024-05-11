@@ -1,5 +1,8 @@
 # Changelog
 
+## Next
+- Fixed named references not working.
+
 ## 1.3.4
 *2024-05-18*
 - Added support for video embeds: currently only supports `{{#ev:youtube}}` and `{{#ev:vimeo}}`.
