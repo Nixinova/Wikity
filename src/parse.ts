@@ -351,6 +351,7 @@ export function parse(data: string, config: Config = {}): Result {
 
             // Tables: {|, |+, !, |-, |, |}
             .replace(/\{\|.+\|\}/gs, (tableInner) => {
+                if (tableInner.includes('{{')) return tableInner;
                 return tableInner
                     // {| data (open table)
                     .replace(re(r`^ \{\| (.*?) $`), (_, attrs) => `<table ${attrs}><tr>`)

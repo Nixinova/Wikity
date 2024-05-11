@@ -8,6 +8,7 @@
 - Fixed underscores appearing in the default page title when present in the URL.
 - Fixed links not being automatically capitalised.
 - Fixed named references not working.
+- Fixed template calls inside table cells breaking the table.
 - Fixed headings not working when containing formatting.
 - Fixed all index numbers in the TOC being '1'.
 
