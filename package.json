@@ -41,8 +41,7 @@
     "dateformat": "^4.6.3",
     "dedent": "^1.5.3",
     "escape-html": "^1.0.3",
-    "glob": "^8.1.0",
-    "html-formatter": "^0.1.9"
+    "glob": "^8.1.0"
   },
   "devDependencies": {
     "@types/dateformat": "^3.0.1",

@@ -2,7 +2,6 @@ import fs from 'fs';
 import paths from 'path';
 import glob from 'glob';
 import dedent from 'dedent';
-const formatter = require('html-formatter'); // does not have type package
 
 import { parse } from './parse';
 import { Config, Result } from './common';
@@ -107,8 +106,8 @@ export function compile(dir: string = '.', config: Config = {}): void {
         if (!fs.existsSync(paths.dirname(outFilePath))) {
             fs.mkdirSync(paths.dirname(outFilePath));
         }
-        const renderedHtml = formatter.render(html.replace(/(<\/\w+>) +(\S)/g, '$1&#32;$2'));
-        fs.writeFileSync(outFilePath, frontMatter + '\n' + renderedHtml, 'utf8');
+        const formattedHtml = html.replace(/\n[\n\s]+/g, '\n');
+        fs.writeFileSync(outFilePath, frontMatter + '\n' + formattedHtml, 'utf8');
 
         // Move images
         glob(imagesFolder + '/*', {}, (err, files) => {
