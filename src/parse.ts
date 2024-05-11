@@ -92,6 +92,7 @@ export function parse(data: string, config: Config = {}): Result {
                         imageData.type = { framed: 'frame', thumbnail: 'thumb' }[param] || param;
                         if (imageData.type === 'thumb') {
                             imageData.hasCaption = true;
+                            imageData.float ??= 'right';
                         }
                     }
                     else if (param.endsWith('px')) {
@@ -129,6 +130,7 @@ export function parse(data: string, config: Config = {}): Result {
                             display: inline-block;
                             float: ${imageData.float || 'none'};
                             vertical-align: ${imageData.align || 'unset'};
+                            background: #fff;
                             ${imageData.style || ''}
                         "
                     >
