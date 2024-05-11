@@ -9,8 +9,9 @@ const r = String.raw;
 const MAX_RECURSION: number = 20;
 const arg: string = r`\s*([^|}]+?)\s*`;
 
-function cleanLink(link: string) {
-    return encodeURI(link.replace(/ /g, '_'));
+function toLinkText(link: string) {
+    const cleanedLink = encodeURI(link.trim().replace(/ /g, '_'));
+    return cleanedLink[0].toUpperCase() + cleanedLink.slice(1);
 }
 
 function parseDimensions(dimStr: string) {
@@ -136,7 +137,7 @@ export function parse(data: string, config: Config = {}): Result {
                 `;
                 const imageLink = imageData.link;
                 if (imageLink) {
-                    content = `<a href="${cleanLink(imageLink)}" title="${imageLink}">${content}</a>`;
+                    content = `<a href="${toLinkText(imageLink)}" title="${imageLink}">${content}</a>`;
                 }
                 return content;
             })
@@ -144,12 +145,12 @@ export function parse(data: string, config: Config = {}): Result {
             // Internal links: [[Page]] and [[Page|Text]]
             .replace(re(r`\[\[ ([^\]|]+?) \]\]`), (_, link) => {
                 if (_.includes('{{')) return _;
-                const content = `<a class="internal-link" title="${link}" href="./${cleanLink(link)}">${link}</a>`;
+                const content = `<a class="internal-link" title="${link}" href="./${toLinkText(link)}">${link}</a>`;
                 return content;
             })
             .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), (_, link, text) => {
                 if (link.includes('{{')) return _;
-                const content = `<a class="internal-link" title="${link}" href="./${cleanLink(link)}">${text}</a>`;
+                const content = `<a class="internal-link" title="${link}" href="./${toLinkText(link)}">${text}</a>`;
                 return content;
             })
             .replace(re(r`(</a>)([a-z]+)`), '$2$1')
@@ -261,7 +262,7 @@ export function parse(data: string, config: Config = {}): Result {
                 let content = '';
                 // Try retrieve template content
                 try {
-                    content = fs.readFileSync(page + '.wiki', { encoding: 'utf8' })
+                    content = fs.readFileSync(toLinkText(page) + '.wiki', { encoding: 'utf8' })
                 }
                 catch {
                     // Return redlink if template doesn't exist

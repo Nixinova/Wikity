@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Fixed links not being automatically capitalised.
 - Fixed named references not working.
 
 ## 1.3.4
