@@ -129,6 +129,7 @@ export function parse(data: string, config: Config = {}): Result {
                         style="
                             display: inline-block;
                             float: ${imageData.float || 'none'};
+                            clear: ${imageData.float || 'none'};
                             vertical-align: ${imageData.align || 'unset'};
                             background: #fff;
                             ${imageData.style || ''}
@@ -138,7 +139,7 @@ export function parse(data: string, config: Config = {}): Result {
                             src="${paths.basename(imagesFolder)}/${paths.relative(imagesFolder, path)}"
                             alt="${imageData.alt || file}"
                             width="${imageData.width || 300}"
-                            height="${imageData.height || 300}"
+                            height="${imageData.height || ''}"
                         >
                         ${imageData.hasCaption ? `<figcaption>${caption}</figcaption>` : ''}
                     </figure>

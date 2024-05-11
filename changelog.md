@@ -11,6 +11,7 @@
 - Fixed template calls inside table cells breaking the table.
 - Fixed headings not working when containing formatting.
 - Fixed all index numbers in the TOC being '1'.
+- Fixed images being deformed to 300x300px by default.
 
 ## 1.3.4
 *2024-05-18*
