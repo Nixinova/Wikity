@@ -143,14 +143,18 @@ export function parse(data: string, config: Config = {}): Result {
                 return content;
             })
 
-            // Internal links: [[Page]] and [[Page|Text]]
+            // Internal links
+            // [[Page]]
             .replace(re(r`\[\[ ([^\]|]+?) \]\]`), (_, link) => {
                 if (_.includes('{{')) return _;
+                if (/(?:File|Image):/.test(link)) return _;
                 const content = `<a class="internal-link" title="${link}" href="./${toLinkText(link)}">${link}</a>`;
                 return content;
             })
+            // [[Page|Text]]
             .replace(re(r`\[\[ ([^\]|]+?) \| ([^\]]+?) \]\]`), (_, link, text) => {
                 if (link.includes('{{')) return _;
+                if (/(?:File|Image):/.test(link)) return _;
                 const content = `<a class="internal-link" title="${link}" href="./${toLinkText(link)}">${text}</a>`;
                 return content;
             })
