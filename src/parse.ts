@@ -14,6 +14,11 @@ function toLinkText(link: string) {
     return cleanedLink[0].toUpperCase() + cleanedLink.slice(1);
 }
 
+function toFileText(link: string) {
+    const cleanedLink = link.trim().replace(/ /g, '_');
+    return cleanedLink[0].toUpperCase() + cleanedLink.slice(1);
+}
+
 function parseDimensions(dimStr: string) {
     const regex = /(\d*)(?:x(\d*))?px/;
     const match = dimStr.match(regex);
@@ -267,12 +272,12 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`(?<!{) {{ \s* ([^#{}|]+?) \s* (\|[^{}]+)? }} (?!})`), (_, title, params = '') => {
                 if (params.includes('{{')) return _;
 
-                const templateFile = title.trim().replace(/ /g, '_');
+                const templateFile = toFileText(title);
                 const page: string = paths.join(templatesFolder, templateFile);
                 let content = '';
                 // Try retrieve template content
                 try {
-                    content = fs.readFileSync(toLinkText(page) + '.wiki', { encoding: 'utf8' })
+                    content = fs.readFileSync(page + '.wiki', { encoding: 'utf8' })
                 }
                 catch {
                     // Return redlink if template doesn't exist
