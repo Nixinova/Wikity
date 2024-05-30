@@ -14,6 +14,7 @@
 <div style="border:1px solid">
 = TOC =
 __TOC__
+</div>
 
 <div style="border:1px solid">
 = Formatting =
