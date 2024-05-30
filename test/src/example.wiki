@@ -125,8 +125,8 @@ code block
 | Cell2 || Cell3
 | Cell4
 |-
-| Inline1 || Inline2
-! End1 || End2
+! colspan=2 | Colspan1
+| colspan=2 | Colspan2
 |}
 </div>
 
