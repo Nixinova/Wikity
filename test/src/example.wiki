@@ -142,16 +142,18 @@ Non-parsed content &amp; tags.
 <div style="border:1px solid">
 = TextFunctions =
 Each side of the <code>=</code> must match.
-* {{#lc:TEXT}}             = text
-* {{#ucfirst:text}}        = Text
+* {{lc:TEXT}}             = text
+* {{ucfirst:text}}        = Text
+* {{padleft:text|5|_}}    = _text
+* {{padright:msg|5|_}}    = msg__
 * {{#len:12345}}           = 5
 * {{#sub:string|2|4}}      = ring
 * {{#pos:text|x}}          = 2
-* {{#padleft:text|5|_}}    = _text
-* {{#padright:msg|5|_}}    = msg__
+* {{#explode:one two three four| |2|3}} = three four
+* {{#count: ababababa | b}} = 4
 * {{#replace:Message|e|3}} = M3ssag3
 * {{#explode:A-B-C-D|-|2}} = C
-* {{#urlencode:t e x t}}   = t%20e%20x%20t
+* {{urlencode:t e x t}}   = t%20e%20x%20t
 * {{#urldecode:a%20b%27c}} = a b'c
 </div>
 
