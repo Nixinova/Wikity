@@ -1,0 +1,5 @@
+{{Header}}
+
+= Index Page =
+
+Welcome to the [[File:diamond.png|10px]] wiki.

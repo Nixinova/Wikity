@@ -8,6 +8,10 @@
 
 This package comes with built-in support for compilation using [Eleventy](https://11ty.dev).
 
+## Exemplar
+
+See the `example` folder for a template on making your own wiki site!
+
 ## Install
 
 Wikity is available [on npm](https://www.npmjs.com/package/wikity).

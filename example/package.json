@@ -1,0 +1,11 @@
+{
+  "name": "my_wiki",
+  "scripts": {
+    "build": "eleventy",
+    "dev": "eleventy --watch --serve"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "wikity": "^1.3.5"
+  }
+}
