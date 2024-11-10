@@ -381,14 +381,8 @@ export function parse(data: string, config: Config = {}): Result {
                 const ref = refs.find(ref => ref.name === refname);
                 if (!ref) return _;
                 ref.i++;
-                const content = `
-                    <sup class="refnote">
-                        <a id="cite-${ref.id}${ref.i > 0 ? `_${ref.i}` : ''}" class="ref" href="#ref-${ref.id}">
-                            [${ref.id}]
-                        </a>
-                    </sup>
-                `.trim();
-                return content;
+                const citeId = `cite-${ref.id}${ref.i > 0 ? `_${ref.i}` : ''}`
+                return `<sup class="refnote"><a id="${citeId}" class="ref" href="#ref-${ref.id}">[${ref.id}]</a></sup>`;
             })
 
             // Nonstandard: ``code`` and ```code blocks```
