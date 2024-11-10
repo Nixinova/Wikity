@@ -1,7 +1,8 @@
 # Changelog
 
 ## Next
-- Fix TOC being misplaced when non-wikitext headings are on the page.
+- Changed TOC generation to only include wikitext headings.
+- Fixed TOC being misplaced when non-wikitext headings are on the page.
 - Fixed spacing issues in output.
 
 ## 1.3.5

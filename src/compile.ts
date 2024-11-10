@@ -51,7 +51,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         // Create TOC
         if (!metadata.notoc && (metadata.toc || (outText.match(/<h\d[^>]*>/g)?.length || 0) > 3)) {
             let toc = '';
-            let headings = Array.from(parsedContent.match(/<h\d[^>]*>.+?<\/h\d>/gs) || []);
+            let headings = Array.from(parsedContent.match(/<h\d auto[^>]*>.+?<\/h\d>/gs) || []);
             headings.forEach(match => {
                 const headingInner: string = match.replace(/\s*<\/?h\d[^>]*>\s*/g, '');
                 const text = headingInner.replace(/<.+?>/g, ''); // remove tags from inner
