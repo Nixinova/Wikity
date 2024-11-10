@@ -72,8 +72,14 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 </div>
             `;
             // Set TOC on page
-            if (outText.includes('<toc></toc>')) outText = outText.replace('<toc></toc>', tocElem);
-            else outText = outText.replace(/<h\d[^>]*>/, tocElem + '$&');
+            if (outText.includes('<toc></toc>')) {
+                // put TOC where explicitly declared
+                outText = outText.replace('<toc></toc>', tocElem);
+            }
+            else {
+                // put TOC above first auto heading
+                outText = outText.replace(/<h[1-6] auto/, tocElem + '$&');
+            }
         }
 
         // Create plaintext of HTML for use as description/metadata property.

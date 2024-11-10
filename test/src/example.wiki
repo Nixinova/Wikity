@@ -1,11 +1,13 @@
 {{displaytitle: Example Page}}
-'''Wikity''' is a very useful build tool!
+<h1>Example</h1>
+'''Wikity''' is a ''very'' useful build tool!
 
 <div style="border:1px solid">
 = Headings =
 = Root =
 == Heading ==
 === Subheading ===
+=== A [[Link Heading]] ===
 == Broken heading ===
 ====== Small heading ======
 == ''fancy'' '''heading'''! ==

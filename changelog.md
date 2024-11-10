@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+- Fix TOC being misplaced when non-wikitext headings are on the page.
+- Fixed spacing issues in output.
+
 ## 1.3.5
 *2024-05-12*
 - Changed output to no longer be prettified.
