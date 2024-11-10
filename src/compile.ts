@@ -77,7 +77,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         }
 
         // Create plaintext of HTML for use as description/metadata property.
-        const plaintextData = parsedContent.replace(/<.+?>/gs, ' ');
+        const plaintextData = parsedContent.replace(/<.+?>/gs, '');
 
         // Create HTML
         const folderUpCount = file.split(/[\/\\]/).length - dir.split(/[\/\\]/).length; // number of folders to go up by to get to root

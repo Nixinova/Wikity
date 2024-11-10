@@ -345,7 +345,7 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`^ (:+) (.+?) $`), (_, lvl, content) => {
                 if (content.includes('{{')) return _;
                 const depth = lvl.length;
-                return `${'<dl>'.repeat(depth)}<dd>${content}</dd>${'</dl>'.repeat(depth)}`
+                return `${'<dl>'.repeat(depth)}<dd>${content}</dd>${'</dl>'.repeat(depth)}`;
             })
             .replace(re(r`^ ; (.+) $`), '<dl><dt>$1</dt></dl>')
             .replace(re(r`</dl> (\s*?) <dl>`), '$1')
@@ -375,7 +375,7 @@ export function parse(data: string, config: Config = {}): Result {
 
                 const refData = { ref: text, id: refs.length + 1, name: refname, i: 0 };
                 refs.push(refData);
-                return `<sup class="refnote"><a id="cite-${refData.id}" class="ref" href="#ref-${refData.id}">[${refData.id}]</a></sup>`
+                return `<sup class="refnote"><a id="cite-${refData.id}" class="ref" href="#ref-${refData.id}">[${refData.id}]</a></sup>`;
             })
             .replace(re(r`< ref \s* name \s* = \s* ["']? ( [^>"']+ ) ["']? \s* (?: /> | > .*? </ref> )`), (_, refname) => {
                 const ref = refs.find(ref => ref.name === refname);
@@ -387,7 +387,7 @@ export function parse(data: string, config: Config = {}): Result {
                             [${ref.id}]
                         </a>
                     </sup>
-                `;
+                `.trim();
                 return content;
             })
 
@@ -414,7 +414,7 @@ export function parse(data: string, config: Config = {}): Result {
                 let multiRefContent = '';
                 if (refdata.i > 0) {
                     for (let i = 0; i <= refdata.i; i++) {
-                        multiRefContent += `<sup><a href="#cite-${refdata.id}${i > 0 ? `_${i}` : ''}">${i + 1}</a></sup>`;
+                        multiRefContent += `<sup><a href="#cite-${refdata.id}${i > 0 ? `_${i}` : ''}">${i + 1}</a></sup>&nbsp;`;
                     }
                 }
                 const refline = `
