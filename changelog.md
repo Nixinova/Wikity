@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.3.6
+*2024-11-14*
 - Changed TOC generation to only include wikitext headings.
 - Fixed TOC being misplaced when non-wikitext headings are on the page.
 - Fixed TOC styling.
