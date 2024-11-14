@@ -3,7 +3,9 @@
 ## Next
 - Changed TOC generation to only include wikitext headings.
 - Fixed TOC being misplaced when non-wikitext headings are on the page.
+- Fixed TOC styling.
 - Fixed spacing issues in output such as in metadata and cite notes.
+- Fixed layout issues with non-`thumb` images.
 
 ## 1.3.5
 *2024-05-12*

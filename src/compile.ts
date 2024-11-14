@@ -60,15 +60,15 @@ export function compile(dir: string = '.', config: Config = {}): void {
             });
             toc = toc.replace(/<\/ol>\s*<ol>/g, '');
             const tocElem = dedent`
-                <div id="page+toc">
-                    <span id="page+toc+heading">
+                <div id="page_toc">
+                    <span id="page_toc_heading">
                         <strong>Contents</strong>
                         [<a href="javascript:void(0)" onclick="
-                            document.getElementById('page+toc+contents').setAttribute('style', this.innerText === 'hide' ? 'display: none;' : '');
+                            document.getElementById('page_toc_contents').setAttribute('style', this.innerText === 'hide' ? 'display: none;' : '');
                             this.innerText = this.innerText === 'hide' ? 'show' : 'hide';
                         ">hide</a>]
                     </span>
-                    <ol id="page+toc+contents">${toc}</ol>
+                    <ol id="page_toc_contents">${toc}</ol>
                 </div>
             `;
             // Set TOC on page
