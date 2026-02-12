@@ -112,9 +112,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         `;
 
         // Write to file
-        if (!fs.existsSync(paths.dirname(outFilePath))) {
-            fs.mkdirSync(paths.dirname(outFilePath));
-        }
+        fs.mkdirSync(paths.dirname(outFilePath), { recursive: true });
         const formattedHtml = html.replace(/\n[\n\s]+/g, '\n');
         fs.writeFileSync(outFilePath, frontMatter + '\n' + formattedHtml, 'utf8');
 
@@ -123,9 +121,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
             if (err) {
                 console.warn(err);
             }
-            if (!fs.existsSync(outputImagesFolder)) {
-                fs.mkdirSync(outputImagesFolder);
-            }
+            fs.mkdirSync(outputImagesFolder, { recursive: true });
             for (const file of files) {
                 fs.copyFileSync(file, paths.join(outputImagesFolder, paths.basename(file)))
             };
