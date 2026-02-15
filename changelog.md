@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.7
+*2026-02-15*
+- Fixed a crash when compiling a file in a subdirectory whose parent contains no files. ([#8](https://github.com/Nixinova/Wikity/issues/8), [#9](https://github.com/Nixinova/Wikity/pull/9))
+
 ## 1.3.6
 *2024-11-14*
 - Changed TOC generation to only include wikitext headings.
