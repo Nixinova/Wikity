@@ -86,7 +86,11 @@ export function compile(dir: string = '.', config: Config = {}): void {
         const plaintextData = parsedContent.replace(/<.+?>/gs, '');
 
         // Create HTML
-        const folderUpCount = file.split(/[\/\\]/).length - dir.split(/[\/\\]/).length; // number of folders to go up by to get to root
+        let folderUpCount = file.split(/[\/\\]/).length - dir.split(/[\/\\]/).length; // number of folders to go up by to get to root
+        if (!config.eleventy) {
+            // Regular mode puts both wiki.css and the root files in the root folder
+            folderUpCount--;
+        }
         const html = dedent`
             <html>
                 <head>

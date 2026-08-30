@@ -4,6 +4,7 @@
 - Changed wiki styles file to not be outputted when empty.
 - Fixed &lt;pre&gt; blocks being parsed as wikitext.
 - Fixed command line arguments not being parsed correctly.
+- Fixed wiki styles import being misformed.
 
 ## 1.3.7
 *2026-02-15*
