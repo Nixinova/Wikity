@@ -1,8 +1,7 @@
+import dateFormat from 'dateformat';
 import fs from 'fs';
 import paths from 'path';
-import dateFormat from 'dateformat';
-
-import { Config, Result, Metadata, RegExpBuilder as re } from './common';
+import { Config, Metadata, RegExpBuilder as re, Result } from './common';
 
 const r = String.raw;
 const MAX_RECURSION: number = 20;
@@ -40,7 +39,6 @@ export function parse(data: string, config: Config = {}): Result {
 
     const templatesFolder = config.templatesFolder ?? 'templates';
     const imagesFolder = config.imagesFolder ?? 'images';
-    const outputFolder = config.outputFolder ?? 'wikity-out';
 
     const vars: Metadata = {};
     const metadata: Metadata = {};
