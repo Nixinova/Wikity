@@ -1,10 +1,10 @@
-import fs from 'fs';
-import paths from 'path';
-import glob from 'glob';
 import dedent from 'dedent';
+import fs from 'fs';
+import glob from 'glob';
+import paths from 'path';
 
-import { parse } from './parse';
 import { Config, Result } from './common';
+import { parse } from './parse';
 import defaultStyles from './wiki.css';
 
 export function eleventyCompile(dir: string = '.', config: Config = {}): void {
@@ -94,7 +94,9 @@ export function compile(dir: string = '.', config: Config = {}): void {
                     <meta name="viewport" content="initial-scale=1.0, width=device-width">
                     <meta name="description" content="${plaintextData.substring(0, 256)}...">
                     <title>${displayTitle}</title>
+                    ${config.defaultStyles ? `
                     <link id="default-styles" rel="stylesheet" href="${'../'.repeat(folderUpCount)}./wiki.css">
+                    ` : ''}
                 </head>
                 <body>
                     <header>
@@ -128,7 +130,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
         });
 
         // Create site styles
-        if (!stylesCreated) {
+        if (!stylesCreated && (config.defaultStyles !== false || config.customStyles)) {
             stylesCreated = true;
             let styles: string = '';
             if (config.defaultStyles !== false) {

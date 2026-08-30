@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Changed wiki styles file to not be outputted when empty.
 - Fixed command line arguments not being parsed correctly.
 
 ## 1.3.7
