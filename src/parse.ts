@@ -1,6 +1,5 @@
 import fs from 'fs';
 import paths from 'path';
-import htmlEscape from 'escape-html';
 import dateFormat from 'dateformat';
 
 import { Config, Result, Metadata, RegExpBuilder as re } from './common';
@@ -58,8 +57,11 @@ export function parse(data: string, config: Config = {}): Result {
 
         outText = outText
 
+            // Passthrough unparsed content
             // Nowiki: <nowiki></nowiki>
             .replace(re(r`<nowiki> ([^]+?) </nowiki>`), (_, m) => (nowikis.push(m), escaper('NOWIKI', nowikiCount++)))
+            // Pre: <pre></pre>
+            .replace(re(r`<pre> ([^]+?) </pre>`), (_, m) => (nowikis.push(m), escaper('PRE', nowikiCount++)))
 
             // Sanitise unacceptable HTML
             .replace(re(r`< \s* (?= (?: script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea ) (?! \s* key.{0,10}${KEY}) )`), '&lt;')
@@ -400,6 +402,8 @@ export function parse(data: string, config: Config = {}): Result {
         outText = outText
             // Restore nowiki contents
             .replace(escaper('NOWIKI', i), nowikis[i])
+            // Restore pre contents
+            .replace(escaper('PRE', i), '<pre>' + nowikis[i] + '</pre>')
     }
     outText = outText
         // References: <references />

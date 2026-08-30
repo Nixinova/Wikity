@@ -132,12 +132,19 @@ code block
 </div>
 
 <div style="border:1px solid">
-= Nowiki =
+= Nowiki & Pre =
 <nowiki>
 Non-parsed content &amp; tags.
 {{#vardefine: varname | var text }}
 <div onclick="malicious"></div>
 </nowiki>
+<pre>
+{| class=wikitable
+! Pre-formatted content.
+| {{#vardefine: varname | var text }}
+|}
+</pre>
+</div>
 </div>
 
 <div style="border:1px solid">
