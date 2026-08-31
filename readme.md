@@ -153,7 +153,7 @@ Your wikitext (`*.wiki`) files go in the root directory by default.
 | `{{#var:varname}}`               | text *(from memory)*                      |
 | `{{#var:varname\|default val}}`  | *(ditto but 'default val' if unset)*      |
 | `{{#switch:a\|a=1\|b=2\|c=3}}`   | 1                                         |
-| `{{#time:dd/mm/yy\|2021-03-28}}` | 28/03/21                                  |
+| `{{#time:d/m/y\|2021-03-28}}`    | 28/03/21                                  |
 | `{{#lc:TEXT}}`                   | text                                      |
 | `{{#ucfirst:text}}`              | Text                                      |
 | `{{#len:12345}}`                 | 5                                         |

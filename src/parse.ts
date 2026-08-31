@@ -2,6 +2,7 @@ import dateFormat from 'dateformat';
 import fs from 'fs';
 import paths from 'path';
 import { Config, Metadata, RegExpBuilder as re, Result } from './common';
+import { convertDateTimeSyntax } from './utils/datetime';
 
 const r = String.raw;
 const MAX_RECURSION: number = 20;
@@ -293,17 +294,12 @@ export function parse(data: string, config: Config = {}): Result {
                     case '#time':
                     case '#date':
                     case '#datetime':
-                        // make sure the characters are not inside a string
-                        let parsedMatch = args[0].replace(/".+?"/g, '').replace(/'.+?'/g, '');
-                        if (/[abcefgijkqruvx]/i.test(parsedMatch)) {
-                            const errMsg = `Wikity does not use Wikipedia's #time function syntax. Use repetition-based formatting (e.g. yyyy-mm-dd) instead.`;
-                            console.warn(`<Wikity> [WARN] ${errMsg}`);
-                        }
+                        const reformatted = convertDateTimeSyntax(args[0])
                         try {
-                            return dateFormat(args[1] ? new Date(args[1]) : new Date(), args[0]);
+                            return dateFormat(args[1] ? new Date(args[1]) : new Date(), reformatted);
                         }
                         catch {
-                            return args[1] || args[0];
+                            return args[1];
                         }
                 }
             })

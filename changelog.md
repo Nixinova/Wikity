@@ -1,5 +1,8 @@
 # Changelog
 
+## Next
+- Changed `#time` parsing to use the correct format patterns.
+
 ## 1.3.9
 *2026-08-31*
 - Added support for galleries.

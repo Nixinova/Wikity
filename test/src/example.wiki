@@ -207,7 +207,8 @@ Each side of the <code>&rarr;</code> must match.
 * {{#switch: this
 | this | or that = that
 }} &rarr; that
-* {{#date: yyyy-mm-dd (ddd) 'm' | 27 Mar 21}} &rarr; [today's date] m
+* {{#time: Y-m-d 'Y-m-d'}} &rarr; [today's date] 'Y-m-d'
+* {{#time: Y-m-d (D) | 31 August 2026}} &rarr; 2026-08-31 (Mon)
 * {{#vardefine: nested | {{#var: null | nil}} {{#vardefine: x | 1}} {{=}}.}} &rarr; (empty: variable defined)
 * {{#var: nested}} &rarr; nil =.
 </div>
