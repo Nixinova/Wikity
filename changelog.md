@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.3.9
+*2026-08-31*
 - Added support for galleries.
 - Added support for plain external links.
 - Changed parsing to remove parsing-internal key attribute from the output HTML.

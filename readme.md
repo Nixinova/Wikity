@@ -96,15 +96,14 @@ The above will use the following file structure (with some example wiki files gi
 (View the above starting at the URL path `/wiki/` when ran in an HTTP server.)
 
 ### Command-line
-```cmd
-$ wikity help
-Display a help message
-$ wikity compile [<folder>] [-o <folder>] [-t <folder>] [-e] [-d]
-Compile Wikity with various options
-$ wikity parse <input>
-Parse raw input into HTML
-$ wikity version
-Display the latest version of Wikity
+- `wikity help`
+  - Display a help message
+- `wikity compile [<folder>] [--outputFolder <folder>] [--templateFolder <folder>] [--eleventy] [--defaultStyles]`
+  - Compile Wikity with various options
+- `wikity parse <input>`
+  - Parse raw input into HTML
+- `wikity version`
+  - Display the latest version of Wikity
 ```
 
 ## Usage
