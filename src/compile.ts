@@ -1,10 +1,9 @@
-import dedent from 'dedent';
 import fs from 'fs';
 import glob from 'glob';
 import paths from 'path';
-
 import { Config, Result } from './common';
 import { parse } from './parse';
+import dedent from './utils/dedent';
 import defaultStyles from './wiki.css';
 
 export function eleventyCompile(dir: string = '.', config: Config = {}): void {
@@ -42,11 +41,13 @@ export function compile(dir: string = '.', config: Config = {}): void {
         const displayTitle: string = metadata.displayTitle || urlPath.replace('.html', '').replace(/_/g, ' ');
 
         // Eleventy configuration
-        const frontMatter = config.eleventy ? dedent`
+        const frontMatter = config.eleventy
+            ? dedent(`
                 ---
                 permalink: /wiki/${urlPath}
                 ---
-            ` : '';
+            `)
+            : '';
 
         // Create TOC
         if (!metadata.notoc && (metadata.toc || (outText.match(/<h\d[^>]*>/g)?.length || 0) > 3)) {
@@ -59,7 +60,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                 toc += `${`<ol>`.repeat(lvl - 1)} <li> <a href="#${encodeURI(text.replace(/ /g, '_'))}">${text}</a> </li> ${`</ol>`.repeat(lvl - 1)}`;
             });
             toc = toc.replace(/<\/ol>\s*<ol>/g, '');
-            const tocElem = dedent`
+            const tocElem = dedent(`
                 <div id="page_toc">
                     <span id="page_toc_heading">
                         <strong>Contents</strong>
@@ -70,7 +71,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                     </span>
                     <ol id="page_toc_contents">${toc}</ol>
                 </div>
-            `;
+            `);
             // Set TOC on page
             if (outText.includes('<toc></toc>')) {
                 // put TOC where explicitly declared
@@ -91,7 +92,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
             // Regular mode puts both wiki.css and the root files in the root folder
             folderUpCount--;
         }
-        const html = dedent`
+        const html = dedent(`
             <html>
                 <head>
                     <meta charset="utf-8">
@@ -115,7 +116,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
                     </footer>
                 </body>
             </html>
-        `;
+        `);
 
         // Write to file
         fs.mkdirSync(paths.dirname(outFilePath), { recursive: true });

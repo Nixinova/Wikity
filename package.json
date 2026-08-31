@@ -40,13 +40,11 @@
   "license": "ISC",
   "dependencies": {
     "dateformat": "^4.6.3",
-    "dedent": "^1.7.2",
     "escape-html": "^1.0.3",
     "glob": "^8.1.0"
   },
   "devDependencies": {
     "@types/dateformat": "^3.0.1",
-    "@types/dedent": "^0.7.2",
     "@types/escape-html": "^1.0.4",
     "@types/glob": "^8.1.0",
     "@types/node": "^12.20.55",
