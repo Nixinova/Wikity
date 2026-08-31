@@ -1,8 +1,11 @@
 # General
 * text=auto
 
+# Wikitext
+*.wiki linguist-detectable
+
 # Module CSS
 *.css.* linguist-language=CSS
 
 # Output
-wikity-out/ linguist-generated
+**/wikity-out/** linguist-generated
