@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Added support for plain external links.
 - Changed parsing to remove parsing-internal key attribute from the output HTML.
 - Fixed parsing of single-line table headings.
 

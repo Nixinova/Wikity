@@ -174,6 +174,12 @@ export function parse(data: string, config: Config = {}): Result {
                 const content = `<a class="external-link" href="${href}">${txt || '[' + (++rawExtLinkCount) + ']'}</a>`
                 return content;
             })
+            // External links (plain)
+            .replace(re(r`(?<!["'>]) ((?:\w+:)?\/\/ [^\s<]+) (?![^<]*<\/a>)`), (_, href) => {
+                if (_.includes('{{')) return _;
+                const content = `<a class="external-link" href="${href}">${href}</a>`
+                return content;
+            })
 
             // Magic words: {{!}}, {{reflist}}, etc
             .replace(re(r`{{ \s* ! \s* }}`), escaper('VERT'))
