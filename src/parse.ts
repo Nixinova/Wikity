@@ -62,7 +62,7 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(re(r`<pre> ([^]+?) </pre>`), (_, m) => (nowikis.push(m), escaper('PRE', nowikiCount++)))
 
             // Sanitise unacceptable HTML
-            .replace(re(r`< \s* (?= (?: script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea ) (?! \s* key.{0,10}${KEY}) )`), '&lt;')
+            .replace(re(r`< \s* (?= (?: script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea ) (?! \s* data-wikity-key.{0,10}${KEY}) )`), '&lt;')
             .replace(re(r`(?<= <[^>]+ ) (\bon(\w+))`), 'data-$2')
 
             // Comments: <!-- -->
@@ -218,7 +218,8 @@ export function parse(data: string, config: Config = {}): Result {
                 }[platform];
                 if (!source) return `<code>Failed to load video ${id} from ${platform}.</code>`;
                 return `
-                    <iframe key="${KEY}"
+                    <iframe
+                        data-wikity-key="${KEY}"
                         src="${source}"
                         width="${width}"
                         height="${height}"
@@ -429,9 +430,9 @@ export function parse(data: string, config: Config = {}): Result {
         // Magic word functions
         .replaceAll(escaper('VERT'), '|')
         .replaceAll(escaper('EQUALS'), '=')
-
-    // Escape all {{ to avoid crashes
-    outText = outText
+        // Remove temporary parsing key attributes
+        .replaceAll(re(r`\s* data-wikity-key \s* = \s* ['"]? ${KEY} ['"]?`), '')
+        // Escape all {{ to avoid crashes
         .replaceAll('{{', '&#123;&#123;')
 
     const result: Result = { data: outText, metadata: metadata };

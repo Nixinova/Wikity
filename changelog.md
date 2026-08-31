@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Changed parsing to remove parsing-internal key attribute from the output HTML.
 - Fixed parsing of single-line table headings.
 
 ## 1.3.8
