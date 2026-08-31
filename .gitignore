@@ -3,7 +3,6 @@ node_modules/
 
 # Site output
 _site/
-wikity-out/
 
 # Compiled source
 dist/

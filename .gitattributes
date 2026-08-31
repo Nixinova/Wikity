@@ -3,3 +3,6 @@
 
 # Module CSS
 *.css.* linguist-language=CSS
+
+# Output
+wikity-out/ linguist-generated
