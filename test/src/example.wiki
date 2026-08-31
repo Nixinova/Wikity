@@ -204,6 +204,9 @@ Each side of the <code>&rarr;</code> must match.
 | val = val!
 | #default = one
 }} &rarr; one
+* {{#switch: this
+| this | or that = that
+}} &rarr; that
 * {{#date: yyyy-mm-dd (ddd) 'm' | 27 Mar 21}} &rarr; [today's date] m
 * {{#vardefine: nested | {{#var: null | nil}} {{#vardefine: x | 1}} {{=}}.}} &rarr; (empty: variable defined)
 * {{#var: nested}} &rarr; nil =.

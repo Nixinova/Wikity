@@ -270,9 +270,26 @@ export function parse(data: string, config: Config = {}): Result {
                         if (re(r`{{ \s* #vardefine \s* : \s* ${args[0]}`).test(outText)) return _; // wait until var is set
                         return vars[args[0]] || args[1] || '';
                     case '#switch':
-                        return args.slice(1)
-                            .map(arg => arg.split(/\s*=\s*/))
-                            .filter(duo => args[0] === duo[0].replace('#default', args[0]))[0][1];
+                        //   #switch: value
+                        // | value1 | value2 = result
+                        // | #default = default result
+                        const valueToLookFor = args[0]
+                        const switchParts = content.slice(1).split(/(?=[=|])/).map((part: string) => part.trim());
+                        let cumuParts: string[] = [];
+                        const dict: Record<string, string> = {};
+                        // collate the key parts into a dict, and then simply look up from it
+                        for (const partStr of switchParts) {
+                            const [char, part] = partStr.split(/(?=[=|])/).map((s: string) => s.trim());
+                            if (char === '=') {
+                                for (const cumuPart of cumuParts) {
+                                    dict[cumuPart] = part;
+                                }
+                                cumuParts = [];
+                            } else {
+                                cumuParts.push(part);
+                            }
+                        }
+                        return dict[valueToLookFor] || dict['#default'] || '';
                     case '#time':
                     case '#date':
                     case '#datetime':

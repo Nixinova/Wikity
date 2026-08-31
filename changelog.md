@@ -5,6 +5,7 @@
 - Added support for plain external links.
 - Changed parsing to remove parsing-internal key attribute from the output HTML.
 - Fixed parsing of single-line table headings.
+- Fixed parsing of complex `#switch` blocks.
 
 ## 1.3.8
 *2026-08-30*
