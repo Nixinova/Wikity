@@ -121,6 +121,10 @@ code block
 ! Head1
 ! Head2 !! Head3
 ! color=red | Head4
+|-
+! rowspan=2 | HeadA
+! HeadB || HeadC
+! | HeadD
 |- class="row"
 | Cell1
 | Cell2 || Cell3

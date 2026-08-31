@@ -1,5 +1,8 @@
 # Changelog
 
+## Next
+- Fixed parsing of single-line table headings.
+
 ## 1.3.8
 *2026-08-30*
 - Changed wiki styles file to not be outputted when empty.

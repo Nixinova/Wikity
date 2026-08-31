@@ -362,6 +362,8 @@ export function parse(data: string, config: Config = {}): Result {
                     .replace(re(r`^ \|- (.*?) $`), (_, attrs) => `</tr><tr ${attrs}>`)
                     // |} (close)
                     .replace(re(r`^ \|\}`), `</tr></table>`)
+                    // prepare: !head||head -> !head!!head (to avoid misparse)
+                    .replace(re(r`^ ! (.+?) \|\| (.+?) $`), (_, head1, head2) => `!${head1}!!${head2}`)
                     // content: !head, !data|head, |text, |data|text, !!head, ||data
                     .replace(re(r`( ^! | ^\| | !! | \|\| ) (?: ( [^|\n]+? ) \|)? ( [^|\n]*? ) (?= $ | !! | \|\| )`), (_, type, data, content) => {
                         const elem = /!/.test(type) ? 'th' : 'td';
