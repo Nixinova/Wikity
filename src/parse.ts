@@ -49,6 +49,8 @@ export function parse(data: string, config: Config = {}): Result {
 
     let outText: string = data;
 
+    let imageParser: (match: string, file: string, params?: string) => string;
+
     for (let l = 0, last = ''; l < MAX_RECURSION; l++) {
         if (last === outText) break;
         last = outText;
@@ -72,7 +74,7 @@ export function parse(data: string, config: Config = {}): Result {
             .replace(/^-{4,}/gm, '<hr>')
 
             // Images: [[File:Image.png|options|caption]]
-            .replace(re(r`\[\[ (?:File|Image): (.*?) (\|.+?)? \]\]`), (_, file, params = '') => {
+            .replace(re(r`\[\[ (?:File|Image): (.*?) (\|.+?)? \]\]`), imageParser = (_, file, params = '') => {
                 if (params.includes('{{')) return _;
                 if (params.includes('[[')) return _;
                 if (!file) return '';
@@ -149,6 +151,17 @@ export function parse(data: string, config: Config = {}): Result {
                     content = `<a href="${toLinkText(imageLink)}" title="${imageLink}">${content}</a>`;
                 }
                 return content;
+            })
+
+            // Galleries
+            // <gallery>Image data</gallery>
+            .replace(re(r`<gallery> ([^]+?) </gallery>`), (_, galleryData: string) => {
+                if (_.includes('{{')) return _;
+                const galleryLines = galleryData.split('\n').map(line => line.trim()).filter(line => line);
+                return galleryLines.map(line => {
+                    const [image, params] = line.split('|');
+                    return imageParser(_, image, params);
+                }).join('\n');
             })
 
             // Internal links

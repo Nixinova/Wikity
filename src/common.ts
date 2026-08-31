@@ -21,5 +21,5 @@ export interface Result {
 }
 
 export function RegExpBuilder(regex: string, flag: string = 'mgi') {
-    return RegExp(regex.replace(/ /g, '').replace(/\|\|.+?\|\|/g, ''), flag);
+    return RegExp(regex.replace(/ |\r?\n/g, '').replace(/\|\|.+?\|\|/g, ''), flag);
 }

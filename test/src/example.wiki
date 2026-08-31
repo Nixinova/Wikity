@@ -62,6 +62,13 @@ __TOC__
 [[File:Example.png|alt=Example]]
 [[File:Example.png|200px|thumb|right|alt=Alt text|Example text]]
 [[File:Example.png|100px|link=]]
+<gallery>
+File:Example.png|(File) Example text
+Example.png|(Plain) Example text
+Example.png|alt=Alt text|Example text (with alt)
+Example.png|200px|frameless|Example text (with meta)
+Example.png
+</gallery>
 </div>
 
 <div style="border:1px solid">

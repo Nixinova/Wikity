@@ -171,3 +171,5 @@ Your wikitext (`*.wiki`) files go in the root directory by default.
 | `<onlyinclude>Yes</onlyinclude>` | Yes                                       |
 | `<includeonly>Yes</includeonly>` | Yes *(blank inside a template)*           |
 | `<nowiki>[[no link]]</nowiki>`   | [[no link]]                               |
+| `<pre>Preformatted text</pre>`   | `Preformatted text`                       |
+| `<gallery>X.png\|Text</gallery>` | ![Text](X.png)
