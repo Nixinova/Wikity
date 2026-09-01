@@ -40,11 +40,10 @@
   "license": "ISC",
   "dependencies": {
     "dateformat": "^4.6.3",
-    "glob": "^8.1.0"
+    "glob": "^13.0.6"
   },
   "devDependencies": {
     "@types/dateformat": "^3.0.1",
-    "@types/glob": "^8.1.0",
     "@types/node": "^20.19.43",
     "typescript": "^7.0.2"
   }

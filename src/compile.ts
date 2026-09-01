@@ -1,5 +1,5 @@
 import fs from 'fs';
-import glob from 'glob';
+import { globSync } from 'glob';
 import paths from 'path';
 import { Config, Result } from './common';
 import { parse } from './parse';
@@ -28,7 +28,7 @@ export function compile(dir: string = '.', config: Config = {}): void {
 
     let stylesCreated = false;
     // Write wikitext files
-    const files = glob.sync(dir + "/**/*.wiki", {});
+    const files = globSync(dir + "/**/*.wiki", {});
     files.forEach((file: string) => {
         const fileData: string = fs.readFileSync(file, { encoding: 'utf8' });
         const { data: parsedContent, metadata }: Result = parse(fileData, newConfig);
@@ -131,15 +131,11 @@ export function compile(dir: string = '.', config: Config = {}): void {
         fs.writeFileSync(outFilePath, frontMatter + '\n' + formattedHtml, 'utf8');
 
         // Move images
-        glob(imagesFolder + '/*', {}, (err, files) => {
-            if (err) {
-                console.warn(err);
-            }
-            fs.mkdirSync(outputImagesFolder, { recursive: true });
-            for (const file of files) {
-                fs.copyFileSync(file, paths.join(outputImagesFolder, paths.basename(file)))
-            };
-        });
+        const imagesFiles = globSync(imagesFolder + "/*");
+        fs.mkdirSync(outputImagesFolder, { recursive: true });
+        for (const file of imagesFiles) {
+            fs.copyFileSync(file, paths.join(outputImagesFolder, paths.basename(file)));
+        }
 
         // Create site styles
         if (!stylesCreated && (config.defaultStyles !== false || config.customStyles)) {
