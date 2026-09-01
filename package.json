@@ -45,7 +45,7 @@
   "devDependencies": {
     "@types/dateformat": "^3.0.1",
     "@types/glob": "^8.1.0",
-    "typescript": "~5.0.4 <5.1"
     "@types/node": "^20.19.43",
+    "typescript": "^7.0.2"
   }
 }
