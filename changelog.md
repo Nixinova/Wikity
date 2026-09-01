@@ -1,6 +1,7 @@
 # Changelog
 
-## Next
+## 1.4.0
+*2026-09-01*
 - Minimum supported Node version is now v20.
 - Added `pagesFolder` option to specify a root folder to keep content pages in (default: `'.'`).
 - Changed `#time` parsing to use the correct format patterns.
@@ -48,7 +49,7 @@
 - Fixed images being deformed to 300x300px by default.
 
 ## 1.3.4
-*2024-05-18*
+*2024-05-10*
 - Added support for video embeds: currently only supports `{{#ev:youtube}}` and `{{#ev:vimeo}}`.
 - Added support for named references.
 - Added styling for infoboxes (`#infobox`).
