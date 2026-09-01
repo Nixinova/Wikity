@@ -12,12 +12,14 @@ export function eleventyCompile(dir: string = '.', config: Config = {}): void {
 
 export function compile(dir: string = '.', config: Config = {}): void {
     // set defaults
+    config.pagesFolder ??= '.';
     config.templatesFolder ??= 'templates';
     config.imagesFolder ??= 'images';
     config.outputFolder ??= 'wikity-out';
 
     // directory variables (absolute paths)
     const baseDir = paths.resolve(dir);
+    const pagesFolder = paths.join(baseDir, config.pagesFolder);
     const templatesFolder = paths.join(baseDir, config.templatesFolder);
     const imagesFolder = paths.join(baseDir, config.imagesFolder);
     const outputFolder = paths.join(baseDir, config.outputFolder);
@@ -33,9 +35,14 @@ export function compile(dir: string = '.', config: Config = {}): void {
 
         let outText: string = parsedContent;
 
-        const filename = file.replace(dir, '').replace(/^[\/\\]/, '');
+        // Construct output file path and URL path
+        const pagesFolderBase = paths.relative(baseDir, pagesFolder).replaceAll('\\', '/');
+        const baseFilename = paths.relative(baseDir, paths.resolve(file)).replaceAll('\\', '/');
+        const filename = pagesFolderBase
+            ? baseFilename.replace(pagesFolderBase + '/', '')
+            : baseFilename;
         const outFilename: string = filename.replace(/ /g, '_').replace('.wiki', '.html');
-        const outFilePath = paths.join(outputFolder, outFilename);
+        const outFilePath = paths.join(outputFolder, outFilename).replaceAll('\\', '/');
         const urlPath: string = outFilename.replace(/(?<=^|\/)\w/g, m => m.toUpperCase()); // capitalise first letters
 
         const displayTitle: string = metadata.displayTitle || urlPath.replace('.html', '').replace(/_/g, ' ');

@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Added `pagesFolder` option to specify a root folder to keep content pages in (default: `'.'`).
 - Changed `#time` parsing to use the correct format patterns.
 
 ## 1.3.9

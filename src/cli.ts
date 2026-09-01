@@ -28,6 +28,7 @@ else if (arg(1).includes('h')) {
         `Compile wikitext files from a given folder.`,
         `  [<folder>]\n${indent(3.5)}Input folder ('.' (current folder) if unset).`,
         `  (-o|--outputFolder) <folder>\n${indent(3.5)}Folder that compiled HTML files are placed in ('wikity-out' if unset).`,
+        `  (-p|--pagesFolder) <folder>\n${indent(3.5)}Where to page wiki content pages ('.' (root folder) if unset).`,
         `  (-t|--templatesFolder) <folder>\n${indent(3.5)}Where to place wiki templates ('templates' if unset).`,
         `  (-i|--imagesFolder) <folder>\n${indent(3.5)}Where to place wiki images ('images' if unset).`,
         `  (-e|--eleventy)\n${indent(3.5)}Compiles files with Eleventy front matter (false if unset).`,
@@ -44,7 +45,6 @@ else if (arg(1).includes('c')) {
     // Run compilation
 
     const configArgs: string[] = args.slice(2);
-    const argsList: string = configArgs.join(' ');
 
     // Retrieve item from arguments list
     const getArgContent = (match: RegExp) => {
@@ -58,12 +58,13 @@ else if (arg(1).includes('c')) {
     // Fetch user-supplied arguments
     const folder = arg(2) || '.';
     const outputFolder = getArgContent(/^-+o/);
+    const pagesFolder = getArgContent(/^-+p/)
     const templatesFolder = getArgContent(/^-+t/);
     const imagesFolder = getArgContent(/^-+i/);
     const eleventy = getArgContent(/^-+e/) !== undefined;
     const defaultStyles = getArgContent(/^-+d/) !== undefined;
 
-    wikity.compile(folder, { outputFolder, templatesFolder, imagesFolder, eleventy, defaultStyles });
+    wikity.compile(folder, { outputFolder, pagesFolder, templatesFolder, imagesFolder, eleventy, defaultStyles });
 }
 else if (arg(1).includes('p')) {
     // Run parsing

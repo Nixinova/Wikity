@@ -38,6 +38,9 @@ Install locally to use in a Node package or install globally for use from the co
     - *Used only with `compile()`.*
     - Where outputted HTML files shall be placed.
     - Default: `'wikity-out'`.
+  - `pagesFolder: string`
+    - What folder content pages are located in.
+    - Default: `'.'` (the root folder).
   - `templatesFolder: string`
     - What folder to place templates in.
     - Default: `'templates'`.
@@ -74,22 +77,26 @@ Use Wikity along with Eleventy to have all your wiki files compiled during the b
 const wikity = require('wikity');
 module.exports = function (eleventyConfig) {
     const rootFolder = 'src';
-    const templatesFolder = 'templates', imagesFolder = 'images'; // defaults; relative to root folder
+    // all of the following are relative to the root folder
+    const pagesFolder = 'pages'; // default is '.' (root folder)
+    const templatesFolder = 'templates'; // default
+    const imagesFolder = 'images'; // default
     const outputFolder = 'wikity-out'; // default
-    const wikityOptions = { eleventy: true, templatesFolder, imagesFolder, outputFolder };
+    const wikityOptions = { eleventy: true, pagesFolder, templatesFolder, imagesFolder, outputFolder };
     const wikityPlugin = () => wikity.compile(rootFolder, wikityOptions);
     eleventyConfig.addPlugin(wikityPlugin);
-    eleventyConfig.addPassthroughCopy({ 'src/images': 'wiki/' + imagesFolder }); // Eleventy does not pass through images by default
+    eleventyConfig.addPassthroughCopy({ [rootFolder + '/' + imagesFolder]: 'wiki/' + imagesFolder }); // Eleventy does not pass through images by default
 }
 ```
 
 The above will use the following file structure (with some example wiki files given):
 
 - `src/`
+  - `pages/`: Directory that content pages are located in
+    - `Index.wiki`: Example page
+    - `Other_Page.wiki`: Example other page
   - `templates/`: Directory for wiki templates (called like `{{this}}`)
   - `images/`: Directory to place images (called like `[[File:this]]`)
-  - `Index.wiki`: Example file
-  - `Other_Page.wiki`: Example other file
 - `wikity-out/`: File templates compiled from the `.wiki` files (add this to `.gitignore`)
 - `wiki/`: Output HTML files compiled from `wikity-out/` (add this to `.gitignore`)
 
@@ -98,7 +105,7 @@ The above will use the following file structure (with some example wiki files gi
 ### Command-line
 - `wikity help`
   - Display a help message
-- `wikity compile [<folder>] [--outputFolder <folder>] [--templateFolder <folder>] [--eleventy] [--defaultStyles]`
+- `wikity compile [<folder>] [--outputFolder <folder>] [--pagesFolder <folder>] [--templateFolder <folder>] [--imagesFolder <folder>] [--eleventy] [--defaultStyles]`
   - Compile Wikity with various options
 - `wikity parse <input>`
   - Parse raw input into HTML

@@ -3,6 +3,8 @@ export type Metadata = Record<string, any>;
 export interface Config {
     /** The folder that Wikity's compiled HTML files are outputted to (defaults to 'wikity-out') */
     outputFolder?: string,
+    /** The folder that wiki pages are to be stored in relative to the root folder */
+    pagesFolder?: string,
     /** The folder that wiki templates are to be stored in relative to the root folder */
     templatesFolder?: string,
     /** The folder that images are to be stored in relative to the root folder */
