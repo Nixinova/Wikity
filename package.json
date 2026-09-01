@@ -11,7 +11,7 @@
     "wikity": "bin/index.js"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=20"
   },
   "files": [
     "bin/",
@@ -45,7 +45,7 @@
   "devDependencies": {
     "@types/dateformat": "^3.0.1",
     "@types/glob": "^8.1.0",
-    "@types/node": "^12.20.55",
     "typescript": "~5.0.4 <5.1"
+    "@types/node": "^20.19.43",
   }
 }

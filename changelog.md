@@ -1,6 +1,7 @@
 # Changelog
 
 ## Next
+- Minimum supported Node version is now v20.
 - Added `pagesFolder` option to specify a root folder to keep content pages in (default: `'.'`).
 - Changed `#time` parsing to use the correct format patterns.
 - Changed output of `--version`.
