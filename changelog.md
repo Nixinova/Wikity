@@ -3,6 +3,7 @@
 ## Next
 - Added `pagesFolder` option to specify a root folder to keep content pages in (default: `'.'`).
 - Changed `#time` parsing to use the correct format patterns.
+- Changed output of `--version`.
 
 ## 1.3.9
 *2026-08-31*

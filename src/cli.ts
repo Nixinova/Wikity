@@ -78,7 +78,7 @@ else if (arg(1).includes('p')) {
 else if (arg(1).includes('v')) {
     // Show version
 
-    console.log('The current version of Wikity is ' + VERSION);
+    console.log('Wikity ' + VERSION);
 }
 else {
     // Unknown command
